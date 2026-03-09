@@ -891,10 +891,9 @@
     updateAuthUI();
   </script>
     
-  <script type="module">
-
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBR3QMI-MtUbIhKgXkBTOWCBW4ZQucjXd0",
@@ -908,20 +907,17 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 전역에서 Firebase 사용 가능하게
 window.db = db;
 
 console.log("Firebase 연결 완료");
 
-async function saveRecord(){
-
+async function saveRecord() {
   const agenda = document.getElementById("agendaInput")?.value || "";
   const team = document.getElementById("teamInput")?.value || "";
   const decision = document.getElementById("decisionInput")?.value || "";
 
-  try{
-
-    await addDoc(collection(db,"agenda"),{
+  try {
+    await addDoc(collection(db, "agenda"), {
       agenda: agenda,
       team: team,
       decision: decision,
@@ -929,12 +925,13 @@ async function saveRecord(){
     });
 
     alert("저장 완료");
-
-  }catch(e){
-    console.error("저장 실패",e);
+  } catch (e) {
+    console.error("저장 실패", e);
+    alert("저장 실패");
   }
-
 }
+
+window.saveRecord = saveRecord;
 </script>
 
 </body>
