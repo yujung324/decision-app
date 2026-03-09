@@ -1,81 +1,79 @@
-
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DecisionTrack</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #f4f7fb;
       color: #1f2937;
     }
-
     .container {
-      max-width: 960px;
+      max-width: 1000px;
       margin: 32px auto;
       padding: 16px;
     }
-
-    .header {
-      margin-bottom: 24px;
-    }
-
+    .header { margin-bottom: 24px; }
     .header h1 {
       margin: 0;
-      font-size: 32px;
+      font-size: 34px;
+      font-weight: 800;
     }
-
     .header p {
       margin: 8px 0 0;
       color: #6b7280;
-      line-height: 1.5;
+      line-height: 1.6;
+      font-size: 15px;
     }
-
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .userbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.06);
       margin-bottom: 22px;
     }
-
     .section-title {
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       font-size: 22px;
+      font-weight: 800;
     }
-
     .sub-title {
       margin: 18px 0 8px;
-      font-size: 15px;
-      font-weight: bold;
+      font-size: 14px;
+      font-weight: 800;
       color: #374151;
     }
-
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 14px;
     }
-
-    .full {
-      grid-column: 1 / -1;
-    }
-
+    .full { grid-column: 1 / -1; }
     label {
       display: block;
       margin-bottom: 6px;
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 800;
       color: #374151;
     }
-
     input, textarea, select {
       width: 100%;
       padding: 12px 14px;
@@ -84,68 +82,98 @@
       font-size: 14px;
       background: #fff;
     }
-
     textarea {
-      min-height: 90px;
+      min-height: 92px;
       resize: vertical;
       line-height: 1.5;
     }
-
-    .vote-box {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 12px;
-    }
-
-    .vote-item {
+    .vote-area {
       background: #f9fafb;
       border: 1px solid #e5e7eb;
-      border-radius: 14px;
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 6px;
+    }
+    .vote-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    .vote-btn, button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .vote-for { background: #dcfce7; color: #166534; }
+    .vote-against { background: #fee2e2; color: #991b1b; }
+    .vote-hold { background: #ede9fe; color: #5b21b6; }
+
+    .primary { background: #2563eb; color: #fff; }
+    .secondary { background: #e5e7eb; color: #111827; }
+    .danger { background: #ef4444; color: #fff; }
+    .warning { background: #f59e0b; color: #fff; }
+
+    .vote-summary {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .vote-pill {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .vote-list {
+      margin-top: 14px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
       padding: 12px;
     }
-
-    .vote-item label {
+    .vote-list-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #6b7280;
       margin-bottom: 8px;
-      text-align: center;
     }
-
-    .vote-item input {
-      text-align: center;
-      font-size: 16px;
-      font-weight: bold;
+    .vote-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
     }
-
+    .vote-item:last-child { border-bottom: none; }
+    .mini-btn {
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      background: #e5e7eb;
+      color: #111827;
+    }
     .actions {
       display: flex;
       gap: 10px;
       margin-top: 18px;
       flex-wrap: wrap;
     }
-
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 12px 16px;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: bold;
+    .search-box {
+      width: 320px;
+      max-width: 100%;
     }
-
-    .primary {
-      background: #2563eb;
-      color: #fff;
-    }
-
-    .secondary {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    .danger {
-      background: #ef4444;
-      color: #fff;
-    }
-
     .decision-list-header {
       display: flex;
       justify-content: space-between;
@@ -154,12 +182,6 @@
       flex-wrap: wrap;
       margin-bottom: 14px;
     }
-
-    .search-box {
-      width: 280px;
-      max-width: 100%;
-    }
-
     .empty {
       padding: 28px 14px;
       text-align: center;
@@ -168,15 +190,13 @@
       border: 1px dashed #cbd5e1;
       border-radius: 14px;
     }
-
     .log-card {
       border: 1px solid #e5e7eb;
-      border-radius: 16px;
+      border-radius: 18px;
       padding: 18px;
       margin-bottom: 14px;
       background: #fff;
     }
-
     .log-top {
       display: flex;
       justify-content: space-between;
@@ -184,58 +204,35 @@
       flex-wrap: wrap;
       margin-bottom: 12px;
     }
-
     .log-title {
       margin: 0;
-      font-size: 20px;
-      font-weight: bold;
+      font-size: 22px;
+      font-weight: 800;
     }
-
     .meta {
       margin-top: 6px;
       color: #6b7280;
       font-size: 13px;
       line-height: 1.5;
     }
-
     .badge-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      align-items: center;
     }
-
     .badge {
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
       font-size: 12px;
-      font-weight: bold;
+      font-weight: 800;
     }
-
-    .draft {
-      background: #fef3c7;
-      color: #92400e;
-    }
-
-    .review {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-
-    .approved {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .rejected {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .deferred {
-      background: #ede9fe;
-      color: #5b21b6;
-    }
+    .draft { background: #fef3c7; color: #92400e; }
+    .review { background: #dbeafe; color: #1d4ed8; }
+    .approved { background: #dcfce7; color: #166534; }
+    .rejected { background: #fee2e2; color: #991b1b; }
+    .deferred { background: #ede9fe; color: #5b21b6; }
 
     .info-grid {
       display: grid;
@@ -243,60 +240,57 @@
       gap: 12px;
       margin-top: 10px;
     }
-
     .info-box {
       background: #f9fafb;
       border: 1px solid #e5e7eb;
       border-radius: 12px;
       padding: 12px;
     }
-
+    .info-box.full-width { grid-column: 1 / -1; }
     .info-label {
       font-size: 12px;
       color: #6b7280;
-      font-weight: bold;
+      font-weight: 800;
       margin-bottom: 6px;
       text-transform: uppercase;
     }
-
     .info-content {
       white-space: pre-wrap;
-      line-height: 1.5;
+      line-height: 1.6;
       font-size: 14px;
     }
-
-    .vote-summary {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-top: 14px;
-    }
-
-    .vote-pill {
-      background: #f3f4f6;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
     .log-actions {
       margin-top: 14px;
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
     }
+    .small-note {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .auto-decision {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #374151;
+    }
+    .edit-mode {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .hidden { display: none !important; }
 
     @media (max-width: 768px) {
-      .form-grid,
-      .info-grid,
-      .vote-box {
-        grid-template-columns: 1fr;
-      }
-
-      .search-box {
-        width: 100%;
-      }
+      .form-grid, .info-grid { grid-template-columns: 1fr; }
+      .search-box { width: 100%; }
     }
   </style>
 </head>
@@ -304,165 +298,452 @@
   <div class="container">
     <div class="header">
       <h1>DecisionTrack</h1>
-      <p>
-        문제 안건을 등록하고, 찬반 의견과 투표, 최종 결정을 남기는
-        회의용 의사결정 기록 앱
-      </p>
+      <p>문제 안건을 등록하고, 찬반 의견과 투표, 최종 결정, 회의 기록을 남기는 팀 의사결정 기록 앱</p>
     </div>
 
-    <div class="card">
-      <h2 class="section-title">New Agenda</h2>
-
+    <div id="authSection" class="card">
+      <h2 class="section-title">Login / Sign Up</h2>
       <div class="form-grid">
-        <div class="full">
-          <label for="topic">안건 / 문제</label>
-          <input id="topic" type="text" placeholder="예: 일본 시장 진출 검토" />
-        </div>
-
         <div>
-          <label for="team">팀</label>
-          <input id="team" type="text" placeholder="예: Strategy Team" />
+          <label for="authName">이름</label>
+          <input id="authName" type="text" placeholder="예: 민수" />
         </div>
-
         <div>
-          <label for="status">진행 상태</label>
-          <select id="status">
-            <option value="Draft">Draft</option>
-            <option value="Review">Review</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Deferred">Deferred</option>
-          </select>
+          <label for="authPassword">비밀번호</label>
+          <input id="authPassword" type="password" placeholder="비밀번호 입력" />
         </div>
+      </div>
+      <div class="actions">
+        <button class="primary" onclick="signUp()">Sign Up</button>
+        <button class="secondary" onclick="login()">Login</button>
+      </div>
+      <div class="small-note">
+        이 로그인은 현재 브라우저에만 저장되는 로컬 로그인입니다.
+      </div>
+    </div>
 
-        <div class="full">
-          <label for="description">안건 설명</label>
-          <textarea id="description" placeholder="무슨 문제인지, 왜 논의하는지, 배경을 입력"></textarea>
+    <div id="appSection" class="hidden">
+      <div class="topbar">
+        <div class="userbox">
+          <strong>현재 사용자:</strong>
+          <span id="currentUserText">-</span>
         </div>
-
-        <div>
-          <label for="pros">찬성 의견 / 장점</label>
-          <textarea id="pros" placeholder="예: 시장 확대 가능&#10;매출 성장 기대"></textarea>
+        <div class="userbox">
+          <label style="display:flex;align-items:center;gap:8px;margin:0;">
+            <input id="myOnlyToggle" type="checkbox" onchange="renderRecords()" style="width:auto;" />
+            내 기록만 보기
+          </label>
+          <button class="danger" onclick="logout()">Logout</button>
         </div>
+      </div>
 
-        <div>
-          <label for="cons">반대 의견 / 단점</label>
-          <textarea id="cons" placeholder="예: 초기 투자 비용 큼&#10;현지 경쟁 강함"></textarea>
-        </div>
+      <div class="card">
+        <h2 class="section-title">
+          New Agenda
+          <span id="editModeBadge" class="edit-mode hidden">수정 중</span>
+        </h2>
 
-        <div class="full">
-          <div class="sub-title">투표</div>
-          <div class="vote-box">
-            <div class="vote-item">
-              <label for="voteFor">찬성 👍</label>
-              <input id="voteFor" type="number" min="0" value="0" />
+        <div class="form-grid">
+          <div class="full">
+            <label for="topic">안건 / 문제</label>
+            <input id="topic" type="text" placeholder="예: 일본 시장 진출 검토" />
+          </div>
+
+          <div>
+            <label for="team">팀</label>
+            <input id="team" type="text" placeholder="예: Strategy Team" />
+          </div>
+
+          <div>
+            <label for="status">진행 상태</label>
+            <select id="status">
+              <option value="Draft">Draft</option>
+              <option value="Review">Review</option>
+              <option value="Approved">Approved</option>
+              <option value="Rejected">Rejected</option>
+              <option value="Deferred">Deferred</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="description">안건 설명</label>
+            <textarea id="description" placeholder="무슨 문제인지, 왜 논의하는지, 배경을 입력"></textarea>
+          </div>
+
+          <div>
+            <label for="pros">찬성 의견 / 장점</label>
+            <textarea id="pros" placeholder="예: 시장 확대 가능&#10;매출 성장 기대"></textarea>
+          </div>
+
+          <div>
+            <label for="cons">반대 의견 / 단점</label>
+            <textarea id="cons" placeholder="예: 초기 투자 비용 큼&#10;현지 경쟁 강함"></textarea>
+          </div>
+
+          <div class="full">
+            <label for="voterName">투표자 이름</label>
+            <input id="voterName" type="text" placeholder="예: 민수" />
+          </div>
+
+          <div class="full">
+            <div class="sub-title">투표</div>
+            <div class="vote-area">
+              <div class="vote-buttons">
+                <button type="button" class="vote-btn vote-for" onclick="addVote('찬성')">👍 찬성</button>
+                <button type="button" class="vote-btn vote-against" onclick="addVote('반대')">👎 반대</button>
+                <button type="button" class="vote-btn vote-hold" onclick="addVote('보류')">⏳ 보류</button>
+              </div>
+
+              <div class="vote-summary">
+                <div class="vote-pill">찬성 👍 <span id="voteForCount">0</span></div>
+                <div class="vote-pill">반대 👎 <span id="voteAgainstCount">0</span></div>
+                <div class="vote-pill">보류 ⏳ <span id="voteHoldCount">0</span></div>
+              </div>
+
+              <div class="auto-decision">
+                자동 판정: <span id="autoDecisionText">Review</span>
+              </div>
+
+              <div class="vote-list">
+                <div class="vote-list-title">투표 기록</div>
+                <div id="voteListContent">아직 투표가 없습니다.</div>
+              </div>
+
+              <div class="small-note">
+                같은 이름은 한 안건에서 한 번만 투표할 수 있습니다. 잘못 투표했으면 취소 후 다시 투표하세요.
+              </div>
             </div>
-            <div class="vote-item">
-              <label for="voteAgainst">반대 👎</label>
-              <input id="voteAgainst" type="number" min="0" value="0" />
-            </div>
-            <div class="vote-item">
-              <label for="voteHold">보류 ⏳</label>
-              <input id="voteHold" type="number" min="0" value="0" />
-            </div>
+          </div>
+
+          <div class="full">
+            <label for="decision">최종 결정</label>
+            <textarea id="decision" placeholder="예: 6개월 파일럿 운영 후 본진출 여부 재검토"></textarea>
+          </div>
+
+          <div class="full">
+            <label for="meetingNotes">회의 기록</label>
+            <textarea id="meetingNotes" placeholder="회의 중 나온 핵심 논의, 결론 배경, 액션 아이템"></textarea>
           </div>
         </div>
 
-        <div class="full">
-          <label for="decision">최종 결정</label>
-          <textarea id="decision" placeholder="예: 3개월 파일럿 테스트 후 본진출 여부 재결정"></textarea>
-        </div>
-
-        <div class="full">
-          <label for="meetingNotes">회의 기록</label>
-          <textarea id="meetingNotes" placeholder="회의 중 나온 핵심 논의, 결론 배경, 액션 아이템"></textarea>
+        <div class="actions">
+          <button id="saveBtn" class="primary" onclick="saveAgenda()">Save Record</button>
+          <button class="secondary" onclick="clearForm()">Clear</button>
+          <button id="cancelEditBtn" class="warning hidden" onclick="cancelEdit()">Cancel Edit</button>
         </div>
       </div>
 
-      <div class="actions">
-        <button class="primary" onclick="saveAgenda()">Save Record</button>
-        <button class="secondary" onclick="clearForm()">Clear</button>
-      </div>
-    </div>
+      <div class="card">
+        <div class="decision-list-header">
+          <h2 class="section-title" style="margin:0;">Meeting Decision Log</h2>
+          <input
+            id="searchInput"
+            class="search-box"
+            type="text"
+            placeholder="안건, 팀, 결정, 회의기록, 투표자 검색"
+            oninput="renderRecords()"
+          />
+        </div>
 
-    <div class="card">
-      <div class="decision-list-header">
-        <h2 class="section-title" style="margin:0;">Meeting Decision Log</h2>
-        <input
-          id="searchInput"
-          class="search-box"
-          type="text"
-          placeholder="안건, 팀, 결정 검색"
-          oninput="renderRecords()"
-        />
+        <div id="recordList"></div>
       </div>
-
-      <div id="recordList"></div>
     </div>
   </div>
 
   <script>
+    let users = JSON.parse(localStorage.getItem("decisionTrackUsers")) || [];
+    let currentUser = JSON.parse(localStorage.getItem("decisionTrackCurrentUser")) || null;
     let records = JSON.parse(localStorage.getItem("decisionTrackRecords")) || [];
+    let currentVotes = [];
+    let editingId = null;
+
+    function saveUsers() {
+      localStorage.setItem("decisionTrackUsers", JSON.stringify(users));
+    }
+
+    function saveCurrentUser() {
+      localStorage.setItem("decisionTrackCurrentUser", JSON.stringify(currentUser));
+    }
+
+    function saveRecords() {
+      localStorage.setItem("decisionTrackRecords", JSON.stringify(records));
+    }
+
+    function signUp() {
+      const name = document.getElementById("authName").value.trim();
+      const password = document.getElementById("authPassword").value.trim();
+
+      if (!name || !password) {
+        alert("이름과 비밀번호를 입력하세요.");
+        return;
+      }
+
+      const exists = users.some(user => user.name.toLowerCase() === name.toLowerCase());
+      if (exists) {
+        alert("이미 존재하는 이름입니다.");
+        return;
+      }
+
+      users.push({ name, password });
+      saveUsers();
+      alert("회원가입 완료. 이제 로그인하세요.");
+      document.getElementById("authPassword").value = "";
+    }
+
+    function login() {
+      const name = document.getElementById("authName").value.trim();
+      const password = document.getElementById("authPassword").value.trim();
+
+      const user = users.find(
+        u => u.name.toLowerCase() === name.toLowerCase() && u.password === password
+      );
+
+      if (!user) {
+        alert("이름 또는 비밀번호가 맞지 않습니다.");
+        return;
+      }
+
+      currentUser = { name: user.name };
+      saveCurrentUser();
+      document.getElementById("authName").value = "";
+      document.getElementById("authPassword").value = "";
+      updateAuthUI();
+    }
+
+    function logout() {
+      currentUser = null;
+      saveCurrentUser();
+      clearForm();
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      const authSection = document.getElementById("authSection");
+      const appSection = document.getElementById("appSection");
+
+      if (currentUser) {
+        authSection.classList.add("hidden");
+        appSection.classList.remove("hidden");
+        document.getElementById("currentUserText").innerText = currentUser.name;
+        renderCurrentVotes();
+        renderRecords();
+      } else {
+        authSection.classList.remove("hidden");
+        appSection.classList.add("hidden");
+      }
+    }
+
+    function getVoteCounts(votes) {
+      return {
+        forCount: votes.filter(v => v.type === "찬성").length,
+        againstCount: votes.filter(v => v.type === "반대").length,
+        holdCount: votes.filter(v => v.type === "보류").length
+      };
+    }
+
+    function getAutoDecision(votes) {
+      const counts = getVoteCounts(votes);
+      if (counts.forCount > counts.againstCount) return "Approved";
+      if (counts.againstCount > counts.forCount) return "Rejected";
+      return "Review";
+    }
+
+    function addVote(type) {
+      const voterName = document.getElementById("voterName").value.trim();
+
+      if (!voterName) {
+        alert("투표자 이름을 입력하세요.");
+        return;
+      }
+
+      const exists = currentVotes.some(v => v.name.toLowerCase() === voterName.toLowerCase());
+      if (exists) {
+        alert("같은 이름은 한 번만 투표할 수 있습니다.");
+        return;
+      }
+
+      currentVotes.push({ name: voterName, type });
+      document.getElementById("voterName").value = "";
+      renderCurrentVotes();
+    }
+
+    function removeCurrentVote(name) {
+      currentVotes = currentVotes.filter(v => v.name !== name);
+      renderCurrentVotes();
+    }
+
+    function renderCurrentVotes() {
+      const counts = getVoteCounts(currentVotes);
+
+      document.getElementById("voteForCount").innerText = counts.forCount;
+      document.getElementById("voteAgainstCount").innerText = counts.againstCount;
+      document.getElementById("voteHoldCount").innerText = counts.holdCount;
+      document.getElementById("autoDecisionText").innerText = getAutoDecision(currentVotes);
+
+      const voteListContent = document.getElementById("voteListContent");
+
+      if (currentVotes.length === 0) {
+        voteListContent.innerHTML = "아직 투표가 없습니다.";
+        return;
+      }
+
+      voteListContent.innerHTML = currentVotes.map(v => {
+        let emoji = "⏳";
+        if (v.type === "찬성") emoji = "👍";
+        if (v.type === "반대") emoji = "👎";
+
+        return `
+          <div class="vote-item">
+            <div>${escapeHtml(v.name)} ${emoji} ${escapeHtml(v.type)}</div>
+            <button class="mini-btn" onclick="removeCurrentVote('${escapeJs(v.name)}')">취소</button>
+          </div>
+        `;
+      }).join("");
+    }
 
     function saveAgenda() {
+      if (!currentUser) {
+        alert("로그인 후 사용하세요.");
+        return;
+      }
+
       const topic = document.getElementById("topic").value.trim();
       const team = document.getElementById("team").value.trim();
-      const status = document.getElementById("status").value;
       const description = document.getElementById("description").value.trim();
       const pros = document.getElementById("pros").value.trim();
       const cons = document.getElementById("cons").value.trim();
-      const voteFor = Number(document.getElementById("voteFor").value || 0);
-      const voteAgainst = Number(document.getElementById("voteAgainst").value || 0);
-      const voteHold = Number(document.getElementById("voteHold").value || 0);
       const decision = document.getElementById("decision").value.trim();
       const meetingNotes = document.getElementById("meetingNotes").value.trim();
 
       if (!topic) {
-        alert("안건/문제를 입력하세요.");
+        alert("안건 / 문제를 입력하세요.");
         return;
       }
 
-      const record = {
-        id: Date.now(),
-        topic,
-        team,
-        status,
-        description,
-        pros,
-        cons,
-        voteFor,
-        voteAgainst,
-        voteHold,
-        decision,
-        meetingNotes,
-        date: new Date().toLocaleDateString("ko-KR"),
-        createdAt: new Date().toLocaleString("ko-KR")
-      };
+      const autoStatus = getAutoDecision(currentVotes);
+      const manualStatus = document.getElementById("status").value;
+      const finalStatus = manualStatus === "Draft" ? autoStatus : manualStatus;
+      const counts = getVoteCounts(currentVotes);
 
-      records.unshift(record);
-      localStorage.setItem("decisionTrackRecords", JSON.stringify(records));
+      if (editingId) {
+        records = records.map(record =>
+          record.id === editingId
+            ? {
+                ...record,
+                topic,
+                team,
+                status: finalStatus,
+                description,
+                pros,
+                cons,
+                voteFor: counts.forCount,
+                voteAgainst: counts.againstCount,
+                voteHold: counts.holdCount,
+                votes: [...currentVotes],
+                decision,
+                meetingNotes,
+                updatedAt: new Date().toLocaleString("ko-KR")
+              }
+            : record
+        );
+      } else {
+        const record = {
+          id: Date.now(),
+          topic,
+          team,
+          status: finalStatus,
+          description,
+          pros,
+          cons,
+          voteFor: counts.forCount,
+          voteAgainst: counts.againstCount,
+          voteHold: counts.holdCount,
+          votes: [...currentVotes],
+          decision,
+          meetingNotes,
+          date: new Date().toLocaleDateString("ko-KR"),
+          createdAt: new Date().toLocaleString("ko-KR"),
+          updatedAt: "",
+          author: currentUser.name
+        };
+        records.unshift(record);
+      }
 
+      saveRecords();
       clearForm();
       renderRecords();
     }
 
+    function editRecord(id) {
+      const record = records.find(r => r.id === id);
+      if (!record) return;
+
+      if (record.author !== currentUser.name) {
+        alert("본인이 작성한 기록만 수정할 수 있습니다.");
+        return;
+      }
+
+      editingId = id;
+      document.getElementById("topic").value = record.topic || "";
+      document.getElementById("team").value = record.team || "";
+      document.getElementById("status").value = record.status || "Draft";
+      document.getElementById("description").value = record.description || "";
+      document.getElementById("pros").value = record.pros || "";
+      document.getElementById("cons").value = record.cons || "";
+      document.getElementById("decision").value = record.decision || "";
+      document.getElementById("meetingNotes").value = record.meetingNotes || "";
+      currentVotes = record.votes ? [...record.votes] : [];
+
+      document.getElementById("saveBtn").innerText = "Update Record";
+      document.getElementById("cancelEditBtn").classList.remove("hidden");
+      document.getElementById("editModeBadge").classList.remove("hidden");
+
+      renderCurrentVotes();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function cancelEdit() {
+      clearForm();
+    }
+
     function clearForm() {
+      editingId = null;
       document.getElementById("topic").value = "";
       document.getElementById("team").value = "";
       document.getElementById("status").value = "Draft";
       document.getElementById("description").value = "";
       document.getElementById("pros").value = "";
       document.getElementById("cons").value = "";
-      document.getElementById("voteFor").value = 0;
-      document.getElementById("voteAgainst").value = 0;
-      document.getElementById("voteHold").value = 0;
       document.getElementById("decision").value = "";
       document.getElementById("meetingNotes").value = "";
+      document.getElementById("voterName").value = "";
+
+      currentVotes = [];
+      document.getElementById("saveBtn").innerText = "Save Record";
+      document.getElementById("cancelEditBtn").classList.add("hidden");
+      document.getElementById("editModeBadge").classList.add("hidden");
+
+      renderCurrentVotes();
     }
 
     function deleteRecord(id) {
+      const record = records.find(r => r.id === id);
+      if (!record) return;
+
+      if (record.author !== currentUser.name) {
+        alert("본인이 작성한 기록만 삭제할 수 있습니다.");
+        return;
+      }
+
+      if (!confirm("이 기록을 삭제할까요?")) return;
+
       records = records.filter(record => record.id !== id);
-      localStorage.setItem("decisionTrackRecords", JSON.stringify(records));
+      saveRecords();
+
+      if (editingId === id) {
+        clearForm();
+      }
+
       renderRecords();
     }
 
@@ -487,11 +768,19 @@
         .replaceAll("'", "&#039;");
     }
 
+    function escapeJs(text) {
+      return String(text).replaceAll("\\", "\\\\").replaceAll("'", "\\'");
+    }
+
     function renderRecords() {
       const list = document.getElementById("recordList");
       const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+      const myOnly = document.getElementById("myOnlyToggle").checked;
 
       const filtered = records.filter(record => {
+        if (myOnly && currentUser && record.author !== currentUser.name) return false;
+
+        const voteNames = (record.votes || []).map(v => `${v.name} ${v.type}`).join(" ");
         const target = [
           record.topic,
           record.team,
@@ -500,7 +789,9 @@
           record.cons,
           record.decision,
           record.meetingNotes,
-          record.status
+          record.status,
+          voteNames,
+          record.author || ""
         ].join(" ").toLowerCase();
 
         return target.includes(keyword);
@@ -517,8 +808,9 @@
             <div>
               <p class="log-title">${escapeHtml(record.topic)}</p>
               <div class="meta">
-                날짜: ${escapeHtml(record.date)}
+                날짜: ${escapeHtml(record.date || "-")}
                 ${record.team ? ` · 팀: ${escapeHtml(record.team)}` : ""}
+                ${record.author ? ` · 작성자: ${escapeHtml(record.author)}` : ""}
               </div>
             </div>
             <div class="badge-row">
@@ -527,7 +819,7 @@
           </div>
 
           ${record.description ? `
-            <div class="info-box" style="margin-bottom:12px;">
+            <div class="info-box full-width" style="margin-bottom:12px;">
               <div class="info-label">안건 설명</div>
               <div class="info-content">${escapeHtml(record.description)}</div>
             </div>
@@ -551,32 +843,52 @@
             <div class="vote-pill">보류 ⏳ ${record.voteHold}</div>
           </div>
 
+          <div class="info-box full-width" style="margin-top:12px;">
+            <div class="info-label">투표자 기록</div>
+            <div class="info-content">${
+              record.votes && record.votes.length > 0
+                ? record.votes.map(v => {
+                    let emoji = "⏳";
+                    if (v.type === "찬성") emoji = "👍";
+                    if (v.type === "반대") emoji = "👎";
+                    return `${escapeHtml(v.name)} ${emoji} ${escapeHtml(v.type)}`;
+                  }).join("\n")
+                : "-"
+            }</div>
+          </div>
+
           ${record.decision ? `
-            <div class="info-box" style="margin-top:14px;">
+            <div class="info-box full-width" style="margin-top:12px;">
               <div class="info-label">최종 결정</div>
               <div class="info-content">${escapeHtml(record.decision)}</div>
             </div>
           ` : ""}
 
           ${record.meetingNotes ? `
-            <div class="info-box" style="margin-top:12px;">
+            <div class="info-box full-width" style="margin-top:12px;">
               <div class="info-label">회의 기록</div>
               <div class="info-content">${escapeHtml(record.meetingNotes)}</div>
             </div>
           ` : ""}
 
           <div class="meta" style="margin-top:12px;">
-            기록 시각: ${escapeHtml(record.createdAt)}
+            생성: ${escapeHtml(record.createdAt || "-")}
+            ${record.updatedAt ? ` · 수정: ${escapeHtml(record.updatedAt)}` : ""}
           </div>
 
           <div class="log-actions">
-            <button class="danger" onclick="deleteRecord(${record.id})">Delete</button>
+            ${currentUser && record.author === currentUser.name ? `
+              <button class="primary" onclick="editRecord(${record.id})">Edit</button>
+              <button class="danger" onclick="deleteRecord(${record.id})">Delete</button>
+            ` : `
+              <button class="secondary" disabled>Read Only</button>
+            `}
           </div>
         </div>
       `).join("");
     }
 
-    renderRecords();
+    updateAuthUI();
   </script>
 </body>
-</html>   .
+</html>
