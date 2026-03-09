@@ -913,6 +913,28 @@ window.db = db;
 
 console.log("Firebase 연결 완료");
 
+async function saveRecord(){
+
+  const agenda = document.getElementById("agendaInput")?.value || "";
+  const team = document.getElementById("teamInput")?.value || "";
+  const decision = document.getElementById("decisionInput")?.value || "";
+
+  try{
+
+    await addDoc(collection(db,"agenda"),{
+      agenda: agenda,
+      team: team,
+      decision: decision,
+      createdAt: new Date().toISOString()
+    });
+
+    alert("저장 완료");
+
+  }catch(e){
+    console.error("저장 실패",e);
+  }
+
+}
 </script>
 
 </body>
