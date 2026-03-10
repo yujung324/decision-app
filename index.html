@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DecisionTrack</title>
+  <title>DecisionTrack Secure</title>
   <link rel="icon" href="DT_20260310_120547_0000.png" />
 
   <style>
@@ -15,7 +15,7 @@
     }
 
     .container{
-      max-width:760px;
+      max-width:900px;
       margin:0 auto;
     }
 
@@ -39,7 +39,7 @@
     label{
       display:block;
       margin:18px 0 8px;
-      font-size:18px;
+      font-size:16px;
       font-weight:700;
     }
 
@@ -49,8 +49,12 @@
       border:2px solid #ddd;
       border-radius:14px;
       padding:14px;
-      font-size:16px;
+      font-size:15px;
       background:#fff;
+    }
+
+    input[readonly]{
+      background:#f3f4f6;
     }
 
     textarea{
@@ -75,28 +79,80 @@
       background:#eef2ff;
       color:#1e3a8a;
       padding:10px 14px;
-      border-radius:999px;
+      border-radius:16px;
       font-weight:700;
-      line-height:1.5;
+      line-height:1.6;
+      white-space:pre-line;
     }
 
     .login-wrap{
-      max-width:520px;
-      margin:40px auto;
+      max-width:620px;
+      margin:30px auto;
     }
 
-    .login-title{
-      font-size:30px;
-      margin-bottom:8px;
+    .login-tabs{
+      display:flex;
+      gap:10px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
     }
 
-    .login-desc{
-      color:#555;
-      margin-bottom:20px;
+    .tab-btn{
+      border:none;
+      border-radius:12px;
+      padding:12px 16px;
+      font-size:15px;
+      font-weight:700;
+      cursor:pointer;
+      background:#e5e7eb;
+    }
+
+    .tab-btn.active{
+      background:#3f6df6;
+      color:#fff;
+    }
+
+    .notice{
+      margin-top:12px;
+      padding:12px;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#9a3412;
+      border-radius:12px;
+      font-size:14px;
       line-height:1.5;
+      white-space:pre-line;
     }
 
-    .login-actions{
+    .success{
+      margin-top:12px;
+      padding:12px;
+      background:#ecfdf5;
+      border:1px solid #a7f3d0;
+      color:#065f46;
+      border-radius:12px;
+      font-size:14px;
+      line-height:1.5;
+      white-space:pre-line;
+    }
+
+    .scope-box{
+      margin-top:12px;
+      padding:12px;
+      background:#eef6ff;
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      border-radius:12px;
+      font-size:14px;
+      line-height:1.5;
+      white-space:pre-line;
+    }
+
+    .login-actions,
+    .vote-buttons,
+    .buttons,
+    .topbar-actions,
+    .card-actions{
       display:flex;
       gap:12px;
       margin-top:18px;
@@ -106,35 +162,25 @@
     .login-actions button,
     .vote-buttons button,
     .buttons button,
-    .topbar button{
+    .topbar-actions button,
+    .card-actions button{
       border:none;
       border-radius:14px;
-      padding:14px 16px;
-      font-size:16px;
+      padding:12px 16px;
+      font-size:15px;
       font-weight:700;
       cursor:pointer;
     }
 
-    .primary{
-      background:#3f6df6;
-      color:#fff;
-    }
-
-    .secondary{
-      background:#e5e7eb;
-      color:#111;
-    }
-
-    .vote-buttons{
-      display:flex;
-      gap:12px;
-      margin-top:18px;
-      flex-wrap:wrap;
-    }
+    .primary{ background:#3f6df6; color:#fff; }
+    .secondary{ background:#e5e7eb; color:#111; }
+    .danger{ background:#dc2626; color:#fff; }
+    .edit{ background:#f59e0b; color:#fff; }
+    .share{ background:#10b981; color:#fff; }
+    .export{ background:#111827; color:#fff; }
 
     .vote-buttons button{
       flex:1;
-      font-size:18px;
       min-width:120px;
     }
 
@@ -155,41 +201,14 @@
       background:#eef0f5;
       border-radius:999px;
       padding:12px 10px;
-      font-size:18px;
+      font-size:16px;
       font-weight:700;
       min-width:120px;
     }
 
-    .buttons{
-      display:flex;
-      gap:12px;
-      margin-top:20px;
-      flex-wrap:wrap;
-    }
-
     .buttons button{
       flex:1;
-      min-width:140px;
-    }
-
-    .save{
-      background:#3f6df6;
-      color:#fff;
-    }
-
-    .clear{
-      background:#e5e7eb;
-      color:#111;
-    }
-
-    .export{
-      background:#111827;
-      color:#fff;
-    }
-
-    .share{
-      background:#10b981;
-      color:#fff;
+      min-width:150px;
     }
 
     .log-wrap{
@@ -221,6 +240,7 @@
       color:#555;
       margin-bottom:8px;
       line-height:1.6;
+      white-space:pre-line;
     }
 
     .small-row{
@@ -251,26 +271,21 @@
       line-height:1.5;
     }
 
-    .notice{
-      margin-top:12px;
-      padding:12px;
-      background:#fff7ed;
-      border:1px solid #fed7aa;
-      color:#9a3412;
-      border-radius:12px;
-      font-size:14px;
-      line-height:1.5;
+    .badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-right:8px;
+      margin-top:4px;
+      background:#eef2ff;
+      color:#1e3a8a;
     }
 
-    .scope-box{
-      margin-top:12px;
-      padding:12px;
-      background:#eef6ff;
-      border:1px solid #bfdbfe;
-      color:#1e3a8a;
-      border-radius:12px;
-      font-size:14px;
-      line-height:1.5;
+    .danger-text{
+      color:#b91c1c;
+      font-weight:700;
     }
 
     @media print {
@@ -279,11 +294,12 @@
         padding:0;
       }
 
+      #authScreen,
       .topbar,
-      .card,
       .buttons,
       .log-tools,
-      #loginScreen{
+      .card-actions,
+      .vote-buttons{
         display:none !important;
       }
 
@@ -300,35 +316,77 @@
     }
   </style>
 </head>
-
 <body>
 
-  <!-- LOGIN SCREEN -->
-  <div id="loginScreen" class="login-wrap">
+  <!-- AUTH SCREEN -->
+  <div id="authScreen" class="login-wrap">
     <div class="card">
-      <h1 class="login-title">DecisionTrack Login</h1>
-      <div class="login-desc">
-        Enter your company, team, and name.<br />
-        People in the same company and team will see the same agendas and vote together.
-      </div>
-
-      <label>Company</label>
-      <input type="text" id="loginCompany" placeholder="Enter company name" />
-
-      <label>Team</label>
-      <input type="text" id="loginTeam" placeholder="Enter team name" />
-
-      <label>Your Name</label>
-      <input type="text" id="loginName" placeholder="Enter your name" />
-
-      <div class="login-actions">
-        <button class="primary" onclick="login()">Login</button>
-      </div>
-
+      <h1>DecisionTrack Secure Login</h1>
       <div class="notice">
-        Same company + same team = shared agenda board.<br />
-        Different company or team = separate agenda board.
+        Real login version
+        - Email / password signup & login
+        - Email verification check
+        - Company/team-based workspace
+        - Edit/Delete permission control
       </div>
+
+      <div class="login-tabs">
+        <button id="tabSignup" class="tab-btn active" onclick="switchAuthTab('signup')">Sign Up</button>
+        <button id="tabLogin" class="tab-btn" onclick="switchAuthTab('login')">Login</button>
+        <button id="tabReset" class="tab-btn" onclick="switchAuthTab('reset')">Reset Password</button>
+      </div>
+
+      <!-- SIGNUP -->
+      <div id="signupPane">
+        <label>Company</label>
+        <input type="text" id="signupCompany" placeholder="Enter company name" />
+
+        <label>Team</label>
+        <input type="text" id="signupTeam" placeholder="Enter team name" />
+
+        <label>Your Name</label>
+        <input type="text" id="signupName" placeholder="Enter your name" />
+
+        <label>Email</label>
+        <input type="email" id="signupEmail" placeholder="Enter email" />
+
+        <label>Password</label>
+        <input type="password" id="signupPassword" placeholder="Enter password" />
+
+        <div class="login-actions">
+          <button class="primary" onclick="signUp()">Create Account</button>
+        </div>
+
+        <div class="notice">
+          New users are created as member.
+          To make someone a leader, change users/{uid}.role to "leader" in Firebase Console or with Admin SDK.
+        </div>
+      </div>
+
+      <!-- LOGIN -->
+      <div id="loginPane" class="hidden">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="Enter email" />
+
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password" />
+
+        <div class="login-actions">
+          <button class="primary" onclick="login()">Login</button>
+        </div>
+      </div>
+
+      <!-- RESET -->
+      <div id="resetPane" class="hidden">
+        <label>Email</label>
+        <input type="email" id="resetEmail" placeholder="Enter email" />
+
+        <div class="login-actions">
+          <button class="primary" onclick="resetPassword()">Send Reset Email</button>
+        </div>
+      </div>
+
+      <div id="authMessage" class="hidden"></div>
     </div>
   </div>
 
@@ -338,15 +396,16 @@
 
       <div class="topbar">
         <div class="user-badge" id="currentUserBadge">Logged in as: -</div>
-        <button class="secondary" onclick="logout()">Logout</button>
+        <div class="topbar-actions">
+          <button class="secondary" onclick="logout()">Logout</button>
+        </div>
       </div>
 
-      <div class="scope-box" id="scopeInfo">
-        Current workspace: -
-      </div>
+      <div class="scope-box" id="scopeInfo">Current workspace: -</div>
 
       <div class="card">
-        <h2>New Agenda</h2>
+        <h2 id="formTitle">New Agenda</h2>
+        <input type="hidden" id="editingRecordId" />
 
         <label>Meeting Date</label>
         <input type="date" id="meetingDate" />
@@ -371,7 +430,7 @@
         <input id="agenda" type="text" placeholder="Agenda title" />
 
         <label>Team</label>
-        <input id="team" type="text" placeholder="Auto-filled from login team" />
+        <input id="team" type="text" readonly />
 
         <label>Description</label>
         <textarea id="description"></textarea>
@@ -383,14 +442,14 @@
         <textarea id="cons"></textarea>
 
         <div class="notice">
-          Draft voting below is optional before saving the agenda.<br />
-          After saving, everyone in the same company/team can vote directly on the saved agenda card.
+          Draft voting below is local only before saving.
+          After saving, people in the same company/team can vote on the saved agenda card.
         </div>
 
         <div class="vote-buttons">
-          <button class="yes" onclick="vote('yes')">👍 Yes</button>
-          <button class="no" onclick="vote('no')">👎 No</button>
-          <button class="hold" onclick="vote('hold')">⏳ Hold</button>
+          <button class="yes" onclick="voteDraft('yes')">👍 Yes</button>
+          <button class="no" onclick="voteDraft('no')">👎 No</button>
+          <button class="hold" onclick="voteDraft('hold')">⏳ Hold</button>
         </div>
 
         <div class="vote-count">
@@ -408,11 +467,13 @@
         <textarea id="meetingRecord"></textarea>
 
         <div class="buttons">
-          <button class="save" onclick="saveRecord()">Save Record</button>
-          <button class="clear" onclick="clearForm()">Clear</button>
+          <button id="saveBtn" class="primary" onclick="saveRecord()">Save Record</button>
+          <button class="secondary" onclick="clearForm()">Clear</button>
           <button class="export" onclick="exportPDF()">Export PDF</button>
           <button class="share" onclick="shareApp()">Share</button>
         </div>
+
+        <div id="formMessage" class="hidden"></div>
       </div>
 
       <div class="log-wrap">
@@ -422,23 +483,34 @@
           <input
             id="searchBox"
             type="text"
-            placeholder="Search agenda / team / decision"
+            placeholder="Search agenda / decision / creator"
             oninput="applyFilters()"
           />
 
-          <select id="teamFilter" onchange="applyFilters()">
-            <option value="">All Teams</option>
+          <select id="statusFilter" onchange="applyFilters()">
+            <option value="">All Status</option>
+            <option value="Open">Open</option>
+            <option value="Done">Done</option>
           </select>
         </div>
 
         <div id="recordList"></div>
       </div>
-
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      sendEmailVerification,
+      sendPasswordResetEmail,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     import {
       getFirestore,
       collection,
@@ -449,7 +521,10 @@
       where,
       doc,
       updateDoc,
-      increment
+      increment,
+      getDoc,
+      setDoc,
+      deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -462,7 +537,9 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
+
     const recordsRef = collection(db, "decisionLogs");
 
     let yes = 0;
@@ -472,12 +549,7 @@
     let currentVotes = {};
     let records = [];
     let unsubscribeRecords = null;
-
-    let currentSession = JSON.parse(localStorage.getItem("decisiontrack_session") || "null") || {
-      company: "",
-      team: "",
-      name: ""
-    };
+    let currentUserProfile = null;
 
     function normalizeName(name){
       return String(name || "")
@@ -500,79 +572,191 @@
       return `${normalizeName(company)}__${normalizeName(team)}`;
     }
 
-    function getCurrentScopeKey(){
-      return getScopeKey(currentSession.company, currentSession.team);
+    function showMessage(targetId, text, type = "notice"){
+      const el = document.getElementById(targetId);
+      el.className = type;
+      el.innerText = text;
+      el.classList.remove("hidden");
     }
 
-    function getCurrentVoterKey(){
-      return `${getCurrentScopeKey()}__${normalizeName(currentSession.name)}`;
+    function hideMessage(targetId){
+      const el = document.getElementById(targetId);
+      el.classList.add("hidden");
+      el.innerText = "";
+      el.className = "hidden";
     }
 
-    function login(){
-      const company = document.getElementById("loginCompany").value.trim();
-      const team = document.getElementById("loginTeam").value.trim();
-      const name = document.getElementById("loginName").value.trim();
+    function switchAuthTab(tab){
+      document.getElementById("signupPane").classList.add("hidden");
+      document.getElementById("loginPane").classList.add("hidden");
+      document.getElementById("resetPane").classList.add("hidden");
 
-      if(company === ""){
-        alert("Please enter company name.");
+      document.getElementById("tabSignup").classList.remove("active");
+      document.getElementById("tabLogin").classList.remove("active");
+      document.getElementById("tabReset").classList.remove("active");
+
+      if(tab === "signup"){
+        document.getElementById("signupPane").classList.remove("hidden");
+        document.getElementById("tabSignup").classList.add("active");
+      }
+
+      if(tab === "login"){
+        document.getElementById("loginPane").classList.remove("hidden");
+        document.getElementById("tabLogin").classList.add("active");
+      }
+
+      if(tab === "reset"){
+        document.getElementById("resetPane").classList.remove("hidden");
+        document.getElementById("tabReset").classList.add("active");
+      }
+
+      hideMessage("authMessage");
+    }
+
+    async function signUp(){
+      hideMessage("authMessage");
+
+      const company = document.getElementById("signupCompany").value.trim();
+      const team = document.getElementById("signupTeam").value.trim();
+      const name = document.getElementById("signupName").value.trim();
+      const email = document.getElementById("signupEmail").value.trim();
+      const password = document.getElementById("signupPassword").value;
+
+      if(!company || !team || !name || !email || !password){
+        showMessage("authMessage", "Please fill in all signup fields.");
         return;
       }
 
-      if(team === ""){
-        alert("Please enter team name.");
+      try{
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const user = cred.user;
+
+        const scopeKey = getScopeKey(company, team);
+
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          email,
+          name,
+          company,
+          team,
+          scopeKey,
+          role: "member",
+          createdAt: serverTimestamp()
+        });
+
+        await sendEmailVerification(user);
+        await signOut(auth);
+
+        showMessage(
+          "authMessage",
+          "Account created.\nVerification email sent.\nPlease verify your email first, then log in.",
+          "success"
+        );
+
+        switchAuthTab("login");
+        document.getElementById("loginEmail").value = email;
+      }catch(error){
+        console.error("Signup error:", error);
+        showMessage("authMessage", formatFirebaseError(error));
+      }
+    }
+
+    async function login(){
+      hideMessage("authMessage");
+
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value;
+
+      if(!email || !password){
+        showMessage("authMessage", "Please enter email and password.");
         return;
       }
 
-      if(name === ""){
-        alert("Please enter your name.");
+      try{
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+
+        if(!cred.user.emailVerified){
+          await signOut(auth);
+          showMessage(
+            "authMessage",
+            "Email is not verified yet.\nPlease open your email and verify first.",
+            "notice"
+          );
+          return;
+        }
+
+        showMessage("authMessage", "Login successful.", "success");
+      }catch(error){
+        console.error("Login error:", error);
+        showMessage("authMessage", formatFirebaseError(error));
+      }
+    }
+
+    async function resetPassword(){
+      hideMessage("authMessage");
+
+      const email = document.getElementById("resetEmail").value.trim();
+      if(!email){
+        showMessage("authMessage", "Please enter your email.");
         return;
       }
 
-      currentSession = { company, team, name };
-      localStorage.setItem("decisiontrack_session", JSON.stringify(currentSession));
+      try{
+        await sendPasswordResetEmail(auth, email);
+        showMessage("authMessage", "Password reset email sent.", "success");
+      }catch(error){
+        console.error("Reset error:", error);
+        showMessage("authMessage", formatFirebaseError(error));
+      }
+    }
+
+    async function logout(){
+      const ok = confirm("Do you want to logout?");
+      if(!ok) return;
+
+      try{
+        await signOut(auth);
+      }catch(error){
+        console.error("Logout error:", error);
+        alert("Logout failed.");
+      }
+    }
+
+    async function loadCurrentUserProfile(uid){
+      const userRef = doc(db, "users", uid);
+      const snap = await getDoc(userRef);
+
+      if(!snap.exists()){
+        throw new Error("User profile document not found in Firestore.");
+      }
+
+      currentUserProfile = snap.data();
       updateAuthUI();
       startRecordsListener();
     }
 
-    function logout(){
-      const ok = confirm("Do you want to logout?");
-      if(!ok) return;
-
-      if(unsubscribeRecords){
-        unsubscribeRecords();
-        unsubscribeRecords = null;
-      }
-
-      currentSession = { company: "", team: "", name: "" };
-      localStorage.removeItem("decisiontrack_session");
-
-      document.getElementById("loginCompany").value = "";
-      document.getElementById("loginTeam").value = "";
-      document.getElementById("loginName").value = "";
-
-      records = [];
-      clearForm();
-      updateAuthUI();
-      renderFiltered([]);
-    }
-
     function updateAuthUI(){
-      const loginScreen = document.getElementById("loginScreen");
+      const authScreen = document.getElementById("authScreen");
       const appScreen = document.getElementById("appScreen");
 
-      if(currentSession.name && currentSession.company && currentSession.team){
-        loginScreen.classList.add("hidden");
+      if(auth.currentUser && currentUserProfile){
+        authScreen.classList.add("hidden");
         appScreen.classList.remove("hidden");
 
         document.getElementById("currentUserBadge").innerText =
-          `Logged in as: ${currentSession.name}\nCompany: ${currentSession.company} | Team: ${currentSession.team}`;
+          `Logged in as: ${currentUserProfile.name}
+Email: ${currentUserProfile.email}
+Company: ${currentUserProfile.company}
+Team: ${currentUserProfile.team}
+Role: ${currentUserProfile.role}`;
 
         document.getElementById("scopeInfo").innerText =
-          `Current workspace: ${currentSession.company} / ${currentSession.team}`;
+          `Current workspace: ${currentUserProfile.company} / ${currentUserProfile.team}
+Scope Key: ${currentUserProfile.scopeKey}`;
 
-        document.getElementById("team").value = currentSession.team;
+        document.getElementById("team").value = currentUserProfile.team;
       }else{
-        loginScreen.classList.remove("hidden");
+        authScreen.classList.remove("hidden");
         appScreen.classList.add("hidden");
       }
     }
@@ -593,21 +777,22 @@
       document.getElementById("voteHistory").innerText = "Draft voters: " + text;
     }
 
-    function vote(type){
-      if(!currentSession.name){
+    function voteDraft(type){
+      if(!auth.currentUser || !currentUserProfile){
         alert("Please login first.");
         return;
       }
 
-      const voterKey = getCurrentVoterKey();
+      const voterKey = auth.currentUser.uid;
 
       if(currentVotes[voterKey]){
-        alert("You already voted on this draft agenda.");
+        alert("You already voted on this draft.");
         return;
       }
 
       currentVotes[voterKey] = {
-        name: currentSession.name,
+        uid: auth.currentUser.uid,
+        name: currentUserProfile.name,
         type
       };
 
@@ -619,8 +804,12 @@
     }
 
     function clearForm(){
+      document.getElementById("editingRecordId").value = "";
+      document.getElementById("formTitle").innerText = "New Agenda";
+      document.getElementById("saveBtn").innerText = "Save Record";
+
       document.getElementById("agenda").value = "";
-      document.getElementById("team").value = currentSession.team || "";
+      document.getElementById("team").value = currentUserProfile?.team || "";
       document.getElementById("description").value = "";
       document.getElementById("pros").value = "";
       document.getElementById("cons").value = "";
@@ -636,29 +825,41 @@
       hold = 0;
       currentVotes = {};
 
+      hideMessage("formMessage");
       updateVoteUI();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function canManageRecord(record){
+      if(!auth.currentUser || !currentUserProfile) return false;
+      if(record.scopeKey !== currentUserProfile.scopeKey) return false;
+
+      return (
+        record.createdByUid === auth.currentUser.uid ||
+        currentUserProfile.role === "leader"
+      );
     }
 
     async function saveRecord(){
-      if(!currentSession.name || !currentSession.company || !currentSession.team){
-        alert("Please login first.");
+      hideMessage("formMessage");
+
+      if(!auth.currentUser || !currentUserProfile){
+        showMessage("formMessage", "Please login first.");
         return;
       }
 
+      const editingId = document.getElementById("editingRecordId").value.trim();
       const agenda = document.getElementById("agenda").value.trim();
-      const team = document.getElementById("team").value.trim() || currentSession.team;
 
       if(agenda === ""){
-        alert("Please enter Agenda.");
+        showMessage("formMessage", "Please enter Agenda.");
         return;
       }
 
-      const scopeKey = getScopeKey(currentSession.company, team);
-
-      const record = {
-        company: currentSession.company,
-        team,
-        scopeKey,
+      const payload = {
+        company: currentUserProfile.company,
+        team: currentUserProfile.team,
+        scopeKey: currentUserProfile.scopeKey,
         meetingDate: document.getElementById("meetingDate").value,
         owner: document.getElementById("decisionOwner").value.trim(),
         status: document.getElementById("status").value,
@@ -669,22 +870,112 @@
         cons: document.getElementById("cons").value.trim(),
         finalDecision: document.getElementById("finalDecision").value.trim(),
         meetingRecord: document.getElementById("meetingRecord").value.trim(),
-        yes,
-        no,
-        hold,
-        voters: currentVotes,
-        createdBy: currentSession.name,
-        date: new Date().toLocaleString(),
-        createdAt: serverTimestamp()
+        updatedAt: serverTimestamp(),
+        updatedByUid: auth.currentUser.uid,
+        updatedByName: currentUserProfile.name
       };
 
       try{
-        await addDoc(recordsRef, record);
-        clearForm();
-        alert("Record saved successfully.");
+        if(editingId){
+          const target = records.find(r => r.id === editingId);
+          if(!target){
+            showMessage("formMessage", "Record not found.");
+            return;
+          }
+
+          if(!canManageRecord(target)){
+            showMessage("formMessage", "You do not have permission to edit this record.");
+            return;
+          }
+
+          await updateDoc(doc(db, "decisionLogs", editingId), payload);
+          showMessage("formMessage", "Record updated successfully.", "success");
+        }else{
+          await addDoc(recordsRef, {
+            ...payload,
+            yes,
+            no,
+            hold,
+            voters: currentVotes,
+            createdByUid: auth.currentUser.uid,
+            createdByName: currentUserProfile.name,
+            createdAt: serverTimestamp(),
+            date: new Date().toLocaleString()
+          });
+
+          showMessage("formMessage", "Record saved successfully.", "success");
+          clearForm();
+        }
       }catch(error){
         console.error("Save error:", error);
-        alert("Save failed. Check Firebase config or Firestore rules.");
+        showMessage("formMessage", "Save failed. Check Firestore rules and auth setup.");
+      }
+    }
+
+    function editRecord(id){
+      const record = records.find(r => r.id === id);
+      if(!record){
+        alert("Record not found.");
+        return;
+      }
+
+      if(!canManageRecord(record)){
+        alert("You do not have permission to edit this record.");
+        return;
+      }
+
+      document.getElementById("editingRecordId").value = id;
+      document.getElementById("formTitle").innerText = "Edit Agenda";
+      document.getElementById("saveBtn").innerText = "Update Record";
+
+      document.getElementById("meetingDate").value = record.meetingDate || "";
+      document.getElementById("decisionOwner").value = record.owner || "";
+      document.getElementById("status").value = record.status || "Open";
+      document.getElementById("priority").value = record.priority || "Low";
+      document.getElementById("agenda").value = record.agenda || "";
+      document.getElementById("team").value = record.team || currentUserProfile.team;
+      document.getElementById("description").value = record.description || "";
+      document.getElementById("pros").value = record.pros || "";
+      document.getElementById("cons").value = record.cons || "";
+      document.getElementById("finalDecision").value = record.finalDecision || "";
+      document.getElementById("meetingRecord").value = record.meetingRecord || "";
+
+      yes = 0;
+      no = 0;
+      hold = 0;
+      currentVotes = {};
+      updateVoteUI();
+
+      hideMessage("formMessage");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function deleteRecord(id){
+      const record = records.find(r => r.id === id);
+      if(!record){
+        alert("Record not found.");
+        return;
+      }
+
+      if(!canManageRecord(record)){
+        alert("You do not have permission to delete this record.");
+        return;
+      }
+
+      const ok = confirm(`Delete this agenda?\n\n${record.agenda}`);
+      if(!ok) return;
+
+      try{
+        await deleteDoc(doc(db, "decisionLogs", id));
+
+        if(document.getElementById("editingRecordId").value === id){
+          clearForm();
+        }
+
+        alert("Record deleted.");
+      }catch(error){
+        console.error("Delete error:", error);
+        alert("Delete failed.");
       }
     }
 
@@ -692,7 +983,7 @@
       const container = document.getElementById("recordList");
 
       if(list.length === 0){
-        container.innerHTML = `<div class="empty">No matching records found in this company/team workspace.</div>`;
+        container.innerHTML = `<div class="empty">No matching records found in this workspace.</div>`;
         return;
       }
 
@@ -703,18 +994,20 @@
               .join(", ")
           : "-";
 
+        const canManage = canManageRecord(r);
+
         return `
           <div class="log-card">
             <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
 
             <div class="meta">
-              Company: ${escapeHtml(r.company || "-")} |
-              Team: ${escapeHtml(r.team || "-")} |
-              Owner: ${escapeHtml(r.owner || "-")} |
-              Priority: ${escapeHtml(r.priority || "-")} |
-              Status: ${escapeHtml(r.status || "-")}
+              <span class="badge">${escapeHtml(r.priority || "-")}</span>
+              <span class="badge">${escapeHtml(r.status || "-")}</span>
+              <span class="badge">${escapeHtml(r.team || "-")}</span>
             </div>
 
+            <div class="small-row"><b>Company:</b> ${escapeHtml(r.company || "-")}</div>
+            <div class="small-row"><b>Owner:</b> ${escapeHtml(r.owner || "-")}</div>
             <div class="small-row"><b>Meeting Date:</b> ${escapeHtml(r.meetingDate || "-")}</div>
             <div class="small-row"><b>Description:</b> ${escapeHtml(r.description || "-")}</div>
             <div class="small-row"><b>Pros:</b> ${escapeHtml(r.pros || "-")}</div>
@@ -735,8 +1028,15 @@
             </div>
 
             <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
-            <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
+            <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdByName || "-")}</div>
             <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
+
+            <div class="card-actions">
+              ${canManage ? `<button class="edit" onclick="editRecord('${r.id}')">Edit</button>` : ""}
+              ${canManage ? `<button class="danger" onclick="deleteRecord('${r.id}')">Delete</button>` : ""}
+            </div>
+
+            ${!canManage ? `<div class="small-row danger-text">You can vote, but only the creator or leader can edit/delete.</div>` : ""}
           </div>
         `;
       }).join("");
@@ -744,43 +1044,22 @@
 
     function applyFilters(){
       const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
-      const selectedTeam = document.getElementById("teamFilter").value;
+      const selectedStatus = document.getElementById("statusFilter").value;
 
       const filtered = records.filter(r => {
         const matchesKeyword =
           (r.agenda || "").toLowerCase().includes(keyword) ||
-          (r.team || "").toLowerCase().includes(keyword) ||
           (r.finalDecision || "").toLowerCase().includes(keyword) ||
-          (r.description || "").toLowerCase().includes(keyword);
+          (r.description || "").toLowerCase().includes(keyword) ||
+          (r.createdByName || "").toLowerCase().includes(keyword);
 
-        const matchesTeam =
-          selectedTeam === "" || (r.team || "") === selectedTeam;
+        const matchesStatus =
+          selectedStatus === "" || (r.status || "") === selectedStatus;
 
-        return matchesKeyword && matchesTeam;
+        return matchesKeyword && matchesStatus;
       });
 
       renderFiltered(filtered);
-    }
-
-    function updateTeamFilter(){
-      const teamFilter = document.getElementById("teamFilter");
-      const currentValue = teamFilter.value;
-
-      const teams = [...new Set(
-        records
-          .map(r => (r.team || "").trim())
-          .filter(team => team !== "")
-      )].sort();
-
-      teamFilter.innerHTML =
-        `<option value="">All Teams</option>` +
-        teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("");
-
-      if(teams.includes(currentValue)){
-        teamFilter.value = currentValue;
-      }else{
-        teamFilter.value = "";
-      }
     }
 
     function sortRecordsByCreatedAtDesc(items){
@@ -789,13 +1068,12 @@
         const bTime = b.createdAt?.seconds ? b.createdAt.seconds : 0;
 
         if(bTime !== aTime) return bTime - aTime;
-
         return String(b.date || "").localeCompare(String(a.date || ""));
       });
     }
 
     function startRecordsListener(){
-      if(!currentSession.company || !currentSession.team) return;
+      if(!currentUserProfile?.scopeKey) return;
 
       if(unsubscribeRecords){
         unsubscribeRecords();
@@ -804,7 +1082,7 @@
 
       const q = query(
         recordsRef,
-        where("scopeKey", "==", getCurrentScopeKey())
+        where("scopeKey", "==", currentUserProfile.scopeKey)
       );
 
       unsubscribeRecords = onSnapshot(
@@ -816,8 +1094,6 @@
           }));
 
           records = sortRecordsByCreatedAtDesc(records);
-
-          updateTeamFilter();
           applyFilters();
         },
         (error) => {
@@ -827,7 +1103,7 @@
     }
 
     async function voteAgenda(id, type){
-      if(!currentSession.name){
+      if(!auth.currentUser || !currentUserProfile){
         alert("Please login first.");
         return;
       }
@@ -838,10 +1114,13 @@
         return;
       }
 
-      const voterKey = getCurrentVoterKey();
-      const existingVoters = record.voters || {};
+      if(record.scopeKey !== currentUserProfile.scopeKey){
+        alert("Not allowed in a different workspace.");
+        return;
+      }
 
-      if(existingVoters[voterKey]){
+      const existingVoters = record.voters || {};
+      if(existingVoters[auth.currentUser.uid]){
         alert("You already voted on this agenda.");
         return;
       }
@@ -851,10 +1130,12 @@
       try{
         await updateDoc(ref, {
           [type]: increment(1),
-          [`voters.${voterKey}`]: {
-            name: currentSession.name,
+          [`voters.${auth.currentUser.uid}`]: {
+            uid: auth.currentUser.uid,
+            name: currentUserProfile.name,
             type
-          }
+          },
+          updatedAt: serverTimestamp()
         });
       }catch(error){
         console.error("Vote error:", error);
@@ -869,8 +1150,8 @@
     function shareApp(){
       if(navigator.share){
         navigator.share({
-          title: "DecisionTrack",
-          text: "DecisionTrack app",
+          title: "DecisionTrack Secure",
+          text: "DecisionTrack secure decision log app",
           url: window.location.href
         }).catch(() => {});
       }else{
@@ -878,24 +1159,61 @@
       }
     }
 
+    function formatFirebaseError(error){
+      const code = error?.code || "";
+      if(code.includes("auth/email-already-in-use")) return "This email is already in use.";
+      if(code.includes("auth/invalid-email")) return "Invalid email format.";
+      if(code.includes("auth/weak-password")) return "Weak password. Use a stronger password.";
+      if(code.includes("auth/invalid-credential")) return "Invalid email or password.";
+      if(code.includes("auth/user-not-found")) return "User not found.";
+      if(code.includes("auth/wrong-password")) return "Wrong password.";
+      if(code.includes("permission-denied")) return "Permission denied by Firestore rules.";
+      return error?.message || "Something went wrong.";
+    }
+
+    window.switchAuthTab = switchAuthTab;
+    window.signUp = signUp;
     window.login = login;
+    window.resetPassword = resetPassword;
     window.logout = logout;
-    window.vote = vote;
+    window.voteDraft = voteDraft;
     window.voteAgenda = voteAgenda;
     window.clearForm = clearForm;
     window.saveRecord = saveRecord;
     window.applyFilters = applyFilters;
     window.exportPDF = exportPDF;
     window.shareApp = shareApp;
+    window.editRecord = editRecord;
+    window.deleteRecord = deleteRecord;
 
-    updateAuthUI();
+    onAuthStateChanged(auth, async (user) => {
+      try{
+        if(unsubscribeRecords){
+          unsubscribeRecords();
+          unsubscribeRecords = null;
+        }
+
+        records = [];
+        currentUserProfile = null;
+        renderFiltered([]);
+
+        if(user){
+          await loadCurrentUserProfile(user.uid);
+        }else{
+          updateAuthUI();
+        }
+
+        clearForm();
+      }catch(error){
+        console.error("Auth state error:", error);
+        alert("User profile load failed. Check Firestore users collection.");
+        await signOut(auth).catch(() => {});
+        updateAuthUI();
+      }
+    });
+
     updateVoteUI();
-    updateTeamFilter();
     renderFiltered([]);
-
-    if(currentSession.name && currentSession.company && currentSession.team){
-      startRecordsListener();
-    }
   </script>
 </body>
 </html>
