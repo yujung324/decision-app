@@ -244,8 +244,114 @@
       font-weight:700;
       font-size:13px;
     }
+
+    /* PDF capture area */
+    #pdfCaptureArea{
+      position:absolute;
+      left:-99999px;
+      top:0;
+      width:800px;
+      background:#ffffff;
+      padding:28px;
+      box-sizing:border-box;
+      color:#111827;
+      font-family: Arial, sans-serif;
+    }
+
+    .pdf-sheet{
+      background:#fff;
+      border:1px solid #e5e7eb;
+      border-radius:18px;
+      padding:28px;
+      box-sizing:border-box;
+    }
+
+    .pdf-title{
+      font-size:30px;
+      font-weight:800;
+      margin-bottom:18px;
+      line-height:1.2;
+      word-break:break-word;
+    }
+
+    .pdf-meta{
+      color:#374151;
+      font-size:18px;
+      line-height:1.8;
+      margin-bottom:18px;
+      white-space:pre-line;
+      word-break:break-word;
+    }
+
+    .pdf-badge{
+      display:inline-block;
+      margin:6px 0 18px;
+      padding:10px 16px;
+      border-radius:999px;
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .pdf-badge.open{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .pdf-badge.locked{
+      background:#f3e8ff;
+      color:#6b21a8;
+    }
+
+    .pdf-section{
+      margin-top:16px;
+      margin-bottom:18px;
+    }
+
+    .pdf-label{
+      font-size:17px;
+      font-weight:800;
+      margin-bottom:8px;
+      color:#111827;
+    }
+
+    .pdf-value{
+      font-size:17px;
+      line-height:1.7;
+      color:#1f2937;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .pdf-votes{
+      display:flex;
+      gap:12px;
+      margin:16px 0;
+      flex-wrap:wrap;
+    }
+
+    .pdf-vote-pill{
+      flex:1;
+      min-width:150px;
+      text-align:center;
+      border-radius:999px;
+      padding:12px 16px;
+      font-size:17px;
+      font-weight:800;
+      background:#eef0f5;
+      color:#111827;
+    }
+
+    .pdf-footer{
+      margin-top:18px;
+      font-size:16px;
+      line-height:1.8;
+      color:#374151;
+      white-space:pre-line;
+      word-break:break-word;
+    }
   </style>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
@@ -409,6 +515,9 @@
   </div>
 
 </div>
+
+<!-- Hidden PDF Capture Area -->
+<div id="pdfCaptureArea" aria-hidden="true"></div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -984,25 +1093,71 @@ Role: ${currentUserProfile.role}`;
   function renderVoteHistory(votersObj){
     const voters = Object.values(votersObj || {});
     if(voters.length === 0) return "No votes yet.";
-    return voters.map(v => `${escapeHtml(v.name || "")} (${escapeHtml(v.type || "")})`).join(", ");
+    return voters.map(v => `${safeText(v.name || "")} (${safeText(v.type || "")})`).join(", ");
   }
 
-  function addWrappedText(pdf, label, value, y, pageWidth){
-    const text = safeText(value) || "-";
-    pdf.setFont("helvetica", "bold");
-    pdf.text(label, 10, y);
-    y += 7;
+  function buildPdfHtml(record){
+    const votingBadge = record.locked
+      ? `<div class="pdf-badge locked">🔒 Voting Closed</div>`
+      : `<div class="pdf-badge open">🟢 Voting Open</div>`;
 
-    pdf.setFont("helvetica", "normal");
-    const lines = pdf.splitTextToSize(text, pageWidth);
-    pdf.text(lines, 10, y);
-    y += (lines.length * 7) + 5;
+    return `
+      <div class="pdf-sheet">
+        <div class="pdf-title">${escapeHtml(record.agenda || "(No Agenda)")}</div>
 
-    if(y > 270){
-      pdf.addPage();
-      y = 20;
-    }
-    return y;
+        <div class="pdf-meta">
+Company: ${escapeHtml(record.company || "-")}
+Team: ${escapeHtml(record.team || "-")}
+Owner: ${escapeHtml(record.owner || "-")}
+Priority: ${escapeHtml(record.priority || "-")}
+Status: ${escapeHtml(record.status || "-")}
+Meeting Date: ${escapeHtml(record.meetingDate || "-")}
+        </div>
+
+        ${votingBadge}
+
+        <div class="pdf-votes">
+          <div class="pdf-vote-pill">Yes ${record.yes || 0}</div>
+          <div class="pdf-vote-pill">No ${record.no || 0}</div>
+          <div class="pdf-vote-pill">Hold ${record.hold || 0}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Description</div>
+          <div class="pdf-value">${escapeHtml(record.description || "-")}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Pros</div>
+          <div class="pdf-value">${escapeHtml(record.pros || "-")}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Cons</div>
+          <div class="pdf-value">${escapeHtml(record.cons || "-")}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Final Decision</div>
+          <div class="pdf-value">${escapeHtml(record.finalDecision || "-")}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Meeting Record</div>
+          <div class="pdf-value">${escapeHtml(record.meetingRecord || "-")}</div>
+        </div>
+
+        <div class="pdf-section">
+          <div class="pdf-label">Voters</div>
+          <div class="pdf-value">${escapeHtml(renderVoteHistory(record.voters))}</div>
+        </div>
+
+        <div class="pdf-footer">
+Created By: ${escapeHtml(record.createdByName || "-")}
+Saved: ${escapeHtml(record.date || "-")}
+        </div>
+      </div>
+    `;
   }
 
   async function exportPDF(id){
@@ -1017,46 +1172,51 @@ Role: ${currentUserProfile.role}`;
       return;
     }
 
+    const captureArea = document.getElementById("pdfCaptureArea");
+
     try{
+      captureArea.innerHTML = buildPdfHtml(record);
+
+      const canvas = await html2canvas(captureArea, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      });
+
+      const imgData = canvas.toDataURL("image/png");
       const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF();
-      const pageWidth = 190;
 
-      let y = 20;
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
 
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(18);
-      pdf.text("DecisionTrack Meeting Record", 10, y);
-      y += 12;
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const imgWidth = 190;
+      const imgHeight = canvas.height * imgWidth / canvas.width;
 
-      pdf.setFontSize(11);
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Company: ${safeText(record.company) || "-"}`, 10, y); y += 7;
-      pdf.text(`Team: ${safeText(record.team) || "-"}`, 10, y); y += 7;
-      pdf.text(`Agenda: ${safeText(record.agenda) || "-"}`, 10, y); y += 7;
-      pdf.text(`Owner: ${safeText(record.owner) || "-"}`, 10, y); y += 7;
-      pdf.text(`Meeting Date: ${safeText(record.meetingDate) || "-"}`, 10, y); y += 7;
-      pdf.text(`Priority: ${safeText(record.priority) || "-"}`, 10, y); y += 7;
-      pdf.text(`Status: ${safeText(record.status) || "-"}`, 10, y); y += 7;
-      pdf.text(`Voting: Yes ${record.yes || 0} / No ${record.no || 0} / Hold ${record.hold || 0}`, 10, y); y += 7;
-      pdf.text(`Voting Locked: ${record.locked ? "Yes" : "No"}`, 10, y); y += 10;
+      let heightLeft = imgHeight;
+      let position = 10;
 
-      y = addWrappedText(pdf, "Description", record.description, y, pageWidth);
-      y = addWrappedText(pdf, "Pros", record.pros, y, pageWidth);
-      y = addWrappedText(pdf, "Cons", record.cons, y, pageWidth);
-      y = addWrappedText(pdf, "Final Decision", record.finalDecision, y, pageWidth);
-      y = addWrappedText(pdf, "Meeting Record", record.meetingRecord, y, pageWidth);
-      y = addWrappedText(pdf, "Voters", renderVoteHistory(record.voters), y, pageWidth);
+      pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+      heightLeft -= (pageHeight - 20);
 
-      pdf.setFont("helvetica", "normal");
-      pdf.text(`Created By: ${safeText(record.createdByName) || "-"}`, 10, y); y += 7;
-      pdf.text(`Saved: ${safeText(record.date) || "-"}`, 10, y);
+      while(heightLeft > 0){
+        position = heightLeft - imgHeight + 10;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 10, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 20);
+      }
 
       const fileName = `${safeText(record.agenda || "meeting_record").replace(/[\\/:*?"<>|]/g, "_")}.pdf`;
       pdf.save(fileName);
     }catch(error){
       console.error(error);
       alert("PDF export failed.");
+    }finally{
+      captureArea.innerHTML = "";
     }
   }
 
@@ -1107,7 +1267,7 @@ Role: ${currentUserProfile.role}`;
             <span>Hold ${r.hold || 0}</span>
           </div>
 
-          <div class="vote-history" style="margin-top:12px;"><b>Voters:</b> ${renderVoteHistory(r.voters)}</div>
+          <div class="vote-history" style="margin-top:12px;"><b>Voters:</b> ${escapeHtml(renderVoteHistory(r.voters))}</div>
 
           <div class="row"><b>Created By:</b> ${escapeHtml(r.createdByName || "-")}</div>
           <div class="row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
