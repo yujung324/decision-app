@@ -77,6 +77,7 @@
       padding:10px 14px;
       border-radius:999px;
       font-weight:700;
+      line-height:1.5;
     }
 
     .login-wrap{
@@ -99,6 +100,7 @@
       display:flex;
       gap:12px;
       margin-top:18px;
+      flex-wrap:wrap;
     }
 
     .login-actions button,
@@ -127,11 +129,13 @@
       display:flex;
       gap:12px;
       margin-top:18px;
+      flex-wrap:wrap;
     }
 
     .vote-buttons button{
       flex:1;
       font-size:18px;
+      min-width:120px;
     }
 
     .yes{background:#dff5e5;}
@@ -258,6 +262,17 @@
       line-height:1.5;
     }
 
+    .scope-box{
+      margin-top:12px;
+      padding:12px;
+      background:#eef6ff;
+      border:1px solid #bfdbfe;
+      color:#1e3a8a;
+      border-radius:12px;
+      font-size:14px;
+      line-height:1.5;
+    }
+
     @media print {
       body{
         background:#fff;
@@ -293,9 +308,15 @@
     <div class="card">
       <h1 class="login-title">DecisionTrack Login</h1>
       <div class="login-desc">
-        Enter your name to use the app.<br />
-        The logged-in name will be used for voting and activity records.
+        Enter your company, team, and name.<br />
+        People in the same company and team will see the same agendas and vote together.
       </div>
+
+      <label>Company</label>
+      <input type="text" id="loginCompany" placeholder="Enter company name" />
+
+      <label>Team</label>
+      <input type="text" id="loginTeam" placeholder="Enter team name" />
 
       <label>Your Name</label>
       <input type="text" id="loginName" placeholder="Enter your name" />
@@ -305,8 +326,8 @@
       </div>
 
       <div class="notice">
-        This is a simple local login structure for MVP use.<br />
-        It is not a real server account system yet.
+        Same company + same team = shared agenda board.<br />
+        Different company or team = separate agenda board.
       </div>
     </div>
   </div>
@@ -318,6 +339,10 @@
       <div class="topbar">
         <div class="user-badge" id="currentUserBadge">Logged in as: -</div>
         <button class="secondary" onclick="logout()">Logout</button>
+      </div>
+
+      <div class="scope-box" id="scopeInfo">
+        Current workspace: -
       </div>
 
       <div class="card">
@@ -346,7 +371,7 @@
         <input id="agenda" type="text" placeholder="Agenda title" />
 
         <label>Team</label>
-        <input id="team" type="text" placeholder="e.g. Marketing" />
+        <input id="team" type="text" placeholder="Auto-filled from login team" />
 
         <label>Description</label>
         <textarea id="description"></textarea>
@@ -358,8 +383,8 @@
         <textarea id="cons"></textarea>
 
         <div class="notice">
-          Voting uses the currently logged-in user only.<br />
-          Current voter: <b id="currentVoterText">-</b>
+          Draft voting below is optional before saving the agenda.<br />
+          After saving, everyone in the same company/team can vote directly on the saved agenda card.
         </div>
 
         <div class="vote-buttons">
@@ -374,7 +399,7 @@
           <span id="holdCount">Hold 0</span>
         </div>
 
-        <div class="vote-history" id="voteHistory">Current voters: none</div>
+        <div class="vote-history" id="voteHistory">Draft voters: none</div>
 
         <label>Final Decision</label>
         <textarea id="finalDecision"></textarea>
@@ -420,8 +445,11 @@
       addDoc,
       onSnapshot,
       query,
-      orderBy,
-      serverTimestamp
+      serverTimestamp,
+      where,
+      doc,
+      updateDoc,
+      increment
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -443,10 +471,20 @@
 
     let currentVotes = {};
     let records = [];
-    let currentUser = localStorage.getItem("decisiontrack_current_user") || "";
+    let unsubscribeRecords = null;
+
+    let currentSession = JSON.parse(localStorage.getItem("decisiontrack_session") || "null") || {
+      company: "",
+      team: "",
+      name: ""
+    };
 
     function normalizeName(name){
-      return name.trim().toLowerCase();
+      return String(name || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9가-힣_-]/g, "");
     }
 
     function escapeHtml(text){
@@ -458,38 +496,81 @@
         .replace(/'/g, "&#039;");
     }
 
+    function getScopeKey(company, team){
+      return `${normalizeName(company)}__${normalizeName(team)}`;
+    }
+
+    function getCurrentScopeKey(){
+      return getScopeKey(currentSession.company, currentSession.team);
+    }
+
+    function getCurrentVoterKey(){
+      return `${getCurrentScopeKey()}__${normalizeName(currentSession.name)}`;
+    }
+
     function login(){
+      const company = document.getElementById("loginCompany").value.trim();
+      const team = document.getElementById("loginTeam").value.trim();
       const name = document.getElementById("loginName").value.trim();
+
+      if(company === ""){
+        alert("Please enter company name.");
+        return;
+      }
+
+      if(team === ""){
+        alert("Please enter team name.");
+        return;
+      }
 
       if(name === ""){
         alert("Please enter your name.");
         return;
       }
 
-      currentUser = name;
-      localStorage.setItem("decisiontrack_current_user", currentUser);
+      currentSession = { company, team, name };
+      localStorage.setItem("decisiontrack_session", JSON.stringify(currentSession));
       updateAuthUI();
+      startRecordsListener();
     }
 
     function logout(){
       const ok = confirm("Do you want to logout?");
       if(!ok) return;
 
-      currentUser = "";
-      localStorage.removeItem("decisiontrack_current_user");
+      if(unsubscribeRecords){
+        unsubscribeRecords();
+        unsubscribeRecords = null;
+      }
+
+      currentSession = { company: "", team: "", name: "" };
+      localStorage.removeItem("decisiontrack_session");
+
+      document.getElementById("loginCompany").value = "";
+      document.getElementById("loginTeam").value = "";
       document.getElementById("loginName").value = "";
+
+      records = [];
+      clearForm();
       updateAuthUI();
+      renderFiltered([]);
     }
 
     function updateAuthUI(){
       const loginScreen = document.getElementById("loginScreen");
       const appScreen = document.getElementById("appScreen");
 
-      if(currentUser){
+      if(currentSession.name && currentSession.company && currentSession.team){
         loginScreen.classList.add("hidden");
         appScreen.classList.remove("hidden");
-        document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser;
-        document.getElementById("currentVoterText").innerText = currentUser;
+
+        document.getElementById("currentUserBadge").innerText =
+          `Logged in as: ${currentSession.name}\nCompany: ${currentSession.company} | Team: ${currentSession.team}`;
+
+        document.getElementById("scopeInfo").innerText =
+          `Current workspace: ${currentSession.company} / ${currentSession.team}`;
+
+        document.getElementById("team").value = currentSession.team;
       }else{
         loginScreen.classList.remove("hidden");
         appScreen.classList.add("hidden");
@@ -501,31 +582,34 @@
       document.getElementById("noCount").innerText = "No " + no;
       document.getElementById("holdCount").innerText = "Hold " + hold;
 
-      const voters = Object.entries(currentVotes);
+      const voters = Object.values(currentVotes);
 
       if(voters.length === 0){
-        document.getElementById("voteHistory").innerText = "Current voters: none";
+        document.getElementById("voteHistory").innerText = "Draft voters: none";
         return;
       }
 
-      const text = voters.map(([name, type]) => `${name} (${type})`).join(", ");
-      document.getElementById("voteHistory").innerText = "Current voters: " + text;
+      const text = voters.map(v => `${v.name} (${v.type})`).join(", ");
+      document.getElementById("voteHistory").innerText = "Draft voters: " + text;
     }
 
     function vote(type){
-      if(!currentUser){
+      if(!currentSession.name){
         alert("Please login first.");
         return;
       }
 
-      const voterKey = normalizeName(currentUser);
+      const voterKey = getCurrentVoterKey();
 
       if(currentVotes[voterKey]){
-        alert("You already voted on this agenda.");
+        alert("You already voted on this draft agenda.");
         return;
       }
 
-      currentVotes[voterKey] = type;
+      currentVotes[voterKey] = {
+        name: currentSession.name,
+        type
+      };
 
       if(type === "yes") yes++;
       if(type === "no") no++;
@@ -536,7 +620,7 @@
 
     function clearForm(){
       document.getElementById("agenda").value = "";
-      document.getElementById("team").value = "";
+      document.getElementById("team").value = currentSession.team || "";
       document.getElementById("description").value = "";
       document.getElementById("pros").value = "";
       document.getElementById("cons").value = "";
@@ -556,26 +640,30 @@
     }
 
     async function saveRecord(){
-      if(!currentUser){
+      if(!currentSession.name || !currentSession.company || !currentSession.team){
         alert("Please login first.");
         return;
       }
 
       const agenda = document.getElementById("agenda").value.trim();
-      const team = document.getElementById("team").value.trim();
+      const team = document.getElementById("team").value.trim() || currentSession.team;
 
       if(agenda === ""){
         alert("Please enter Agenda.");
         return;
       }
 
+      const scopeKey = getScopeKey(currentSession.company, team);
+
       const record = {
+        company: currentSession.company,
+        team,
+        scopeKey,
         meetingDate: document.getElementById("meetingDate").value,
         owner: document.getElementById("decisionOwner").value.trim(),
         status: document.getElementById("status").value,
         priority: document.getElementById("priority").value,
         agenda,
-        team,
         description: document.getElementById("description").value.trim(),
         pros: document.getElementById("pros").value.trim(),
         cons: document.getElementById("cons").value.trim(),
@@ -585,7 +673,7 @@
         no,
         hold,
         voters: currentVotes,
-        createdBy: currentUser,
+        createdBy: currentSession.name,
         date: new Date().toLocaleString(),
         createdAt: serverTimestamp()
       };
@@ -604,14 +692,14 @@
       const container = document.getElementById("recordList");
 
       if(list.length === 0){
-        container.innerHTML = `<div class="empty">No matching records found.</div>`;
+        container.innerHTML = `<div class="empty">No matching records found in this company/team workspace.</div>`;
         return;
       }
 
       container.innerHTML = list.map(r => {
         const voterEntries = r.voters
-          ? Object.entries(r.voters)
-              .map(([name, type]) => `${escapeHtml(name)} (${escapeHtml(type)})`)
+          ? Object.values(r.voters)
+              .map(v => `${escapeHtml(v.name || "")} (${escapeHtml(v.type || "")})`)
               .join(", ")
           : "-";
 
@@ -620,6 +708,7 @@
             <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
 
             <div class="meta">
+              Company: ${escapeHtml(r.company || "-")} |
               Team: ${escapeHtml(r.team || "-")} |
               Owner: ${escapeHtml(r.owner || "-")} |
               Priority: ${escapeHtml(r.priority || "-")} |
@@ -632,7 +721,19 @@
             <div class="small-row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
             <div class="small-row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
             <div class="small-row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
-            <div class="small-row"><b>Votes:</b> Yes ${r.yes ?? 0} / No ${r.no ?? 0} / Hold ${r.hold ?? 0}</div>
+
+            <div class="vote-buttons">
+              <button class="yes" onclick="voteAgenda('${r.id}','yes')">👍 Yes</button>
+              <button class="no" onclick="voteAgenda('${r.id}','no')">👎 No</button>
+              <button class="hold" onclick="voteAgenda('${r.id}','hold')">⏳ Hold</button>
+            </div>
+
+            <div class="vote-count">
+              <span>Yes ${r.yes ?? 0}</span>
+              <span>No ${r.no ?? 0}</span>
+              <span>Hold ${r.hold ?? 0}</span>
+            </div>
+
             <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
             <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
             <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
@@ -682,6 +783,85 @@
       }
     }
 
+    function sortRecordsByCreatedAtDesc(items){
+      return [...items].sort((a, b) => {
+        const aTime = a.createdAt?.seconds ? a.createdAt.seconds : 0;
+        const bTime = b.createdAt?.seconds ? b.createdAt.seconds : 0;
+
+        if(bTime !== aTime) return bTime - aTime;
+
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      });
+    }
+
+    function startRecordsListener(){
+      if(!currentSession.company || !currentSession.team) return;
+
+      if(unsubscribeRecords){
+        unsubscribeRecords();
+        unsubscribeRecords = null;
+      }
+
+      const q = query(
+        recordsRef,
+        where("scopeKey", "==", getCurrentScopeKey())
+      );
+
+      unsubscribeRecords = onSnapshot(
+        q,
+        (snapshot) => {
+          records = snapshot.docs.map(docSnap => ({
+            id: docSnap.id,
+            ...docSnap.data()
+          }));
+
+          records = sortRecordsByCreatedAtDesc(records);
+
+          updateTeamFilter();
+          applyFilters();
+        },
+        (error) => {
+          console.error("Snapshot error:", error);
+        }
+      );
+    }
+
+    async function voteAgenda(id, type){
+      if(!currentSession.name){
+        alert("Please login first.");
+        return;
+      }
+
+      const record = records.find(r => r.id === id);
+      if(!record){
+        alert("Agenda not found.");
+        return;
+      }
+
+      const voterKey = getCurrentVoterKey();
+      const existingVoters = record.voters || {};
+
+      if(existingVoters[voterKey]){
+        alert("You already voted on this agenda.");
+        return;
+      }
+
+      const ref = doc(db, "decisionLogs", id);
+
+      try{
+        await updateDoc(ref, {
+          [type]: increment(1),
+          [`voters.${voterKey}`]: {
+            name: currentSession.name,
+            type
+          }
+        });
+      }catch(error){
+        console.error("Vote error:", error);
+        alert("Vote failed.");
+      }
+    }
+
     function exportPDF(){
       window.print();
     }
@@ -698,27 +878,10 @@
       }
     }
 
-    const q = query(recordsRef, orderBy("createdAt", "desc"));
-
-    onSnapshot(
-      q,
-      (snapshot) => {
-        records = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-
-        updateTeamFilter();
-        applyFilters();
-      },
-      (error) => {
-        console.error("Snapshot error:", error);
-      }
-    );
-
     window.login = login;
     window.logout = logout;
     window.vote = vote;
+    window.voteAgenda = voteAgenda;
     window.clearForm = clearForm;
     window.saveRecord = saveRecord;
     window.applyFilters = applyFilters;
@@ -728,7 +891,11 @@
     updateAuthUI();
     updateVoteUI();
     updateTeamFilter();
-    applyFilters();
+    renderFiltered([]);
+
+    if(currentSession.name && currentSession.company && currentSession.team){
+      startRecordsListener();
+    }
   </script>
 </body>
 </html>
