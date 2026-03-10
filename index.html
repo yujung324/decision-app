@@ -1,64 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecisionTrack</title>
 
 <style>
 
 body{
-font-family:Arial;
-background:#f3f5f7;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+background:#f4f6f8;
 padding:20px;
 }
 
 .container{
-max-width:800px;
+max-width:600px;
 margin:auto;
 }
 
 .card{
 background:white;
-padding:20px;
-border-radius:10px;
+padding:25px;
+border-radius:14px;
+box-shadow:0 6px 20px rgba(0,0,0,0.08);
 margin-bottom:20px;
-box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+h1{
+margin-bottom:20px;
+}
+
+label{
+font-weight:600;
+margin-top:12px;
+display:block;
 }
 
 input,textarea{
 width:100%;
-padding:8px;
-margin:6px 0;
-}
-
-button{
-padding:8px 12px;
-margin-top:6px;
-cursor:pointer;
-border:none;
-background:#2d7ff9;
-color:white;
-border-radius:5px;
-}
-
-button.delete{
-background:#e74c3c;
-}
-
-.vote button{
-background:#555;
-margin-right:5px;
-}
-
-.search{
-margin-bottom:20px;
-}
-
-.summary{
-background:#f7f9ff;
 padding:10px;
-border-radius:6px;
+margin-top:6px;
+border-radius:8px;
+border:1px solid #ddd;
+}
+
+.vote-buttons{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
+
+.vote-buttons button{
+flex:1;
+padding:12px;
+border:none;
+border-radius:10px;
+font-size:16px;
+cursor:pointer;
+}
+
+.yes{
+background:#dff5e5;
+}
+
+.no{
+background:#ffdede;
+}
+
+.hold{
+background:#e8e4ff;
+}
+
+.count{
+display:flex;
+justify-content:space-between;
 margin-top:10px;
+font-weight:600;
+}
+
+.decision-box{
+border:2px solid #d6a54a;
+border-radius:12px;
+padding:15px;
+margin-top:10px;
+}
+
+.save{
+background:#3b6eea;
+color:white;
+padding:12px;
+border:none;
+border-radius:10px;
+margin-top:15px;
+cursor:pointer;
+}
+
+.clear{
+background:#ddd;
+padding:12px;
+border:none;
+border-radius:10px;
+margin-top:15px;
+margin-left:10px;
+cursor:pointer;
 }
 
 </style>
@@ -72,176 +116,25 @@ margin-top:10px;
 
 <div class="card">
 
-<h3>New Agenda</h3>
+<h2>New Agenda</h2>
 
-<input id="agenda" placeholder="Agenda">
+<label>안건</label>
+<input id="agenda">
 
-<input id="team" placeholder="Team">
+<label>팀</label>
+<input id="team">
 
-<textarea id="description" placeholder="Description"></textarea>
+<label>설명</label>
+<textarea id="desc"></textarea>
 
-<textarea id="pros" placeholder="Pros"></textarea>
+<label>찬성 의견</label>
+<textarea id="pros"></textarea>
 
-<textarea id="cons" placeholder="Cons"></textarea>
+<label>반대 의견</label>
+<textarea id="cons"></textarea>
 
-<button onclick="saveDecision()">Save Decision</button>
+<label>투표자</label>
+<input id="voter">
 
-</div>
-
-<div class="search">
-
-<input id="search" placeholder="Search agenda..." onkeyup="render()">
-
-</div>
-
-<h2>Decision Log</h2>
-
-<div id="log"></div>
-
-</div>
-
-<script>
-
-let decisions = JSON.parse(localStorage.getItem("decisions")) || [];
-
-function saveDecision(){
-
-let agenda=document.getElementById("agenda").value;
-let team=document.getElementById("team").value;
-let description=document.getElementById("description").value;
-let pros=document.getElementById("pros").value;
-let cons=document.getElementById("cons").value;
-
-let summary = generateSummary(pros,cons);
-
-let item = {
-agenda,
-team,
-description,
-pros,
-cons,
-summary,
-up:0,
-down:0,
-date:new Date().toLocaleDateString()
-};
-
-decisions.push(item);
-
-localStorage.setItem("decisions",JSON.stringify(decisions));
-
-clearForm();
-
-render();
-
-}
-
-function generateSummary(pros,cons){
-
-let p=pros.split("\n").length;
-let c=cons.split("\n").length;
-
-if(p>c){
-return "Recommendation: Proceed (Pros stronger)";
-}
-
-if(c>p){
-return "Recommendation: Reconsider (Cons stronger)";
-}
-
-return "Recommendation: Needs further discussion";
-
-}
-
-function clearForm(){
-
-document.getElementById("agenda").value="";
-document.getElementById("team").value="";
-document.getElementById("description").value="";
-document.getElementById("pros").value="";
-document.getElementById("cons").value="";
-
-}
-
-function vote(i,type){
-
-if(type==="up")decisions[i].up++;
-if(type==="down")decisions[i].down++;
-
-localStorage.setItem("decisions",JSON.stringify(decisions));
-
-render();
-
-}
-
-function removeDecision(i){
-
-decisions.splice(i,1);
-
-localStorage.setItem("decisions",JSON.stringify(decisions));
-
-render();
-
-}
-
-function render(){
-
-let log=document.getElementById("log");
-
-let search=document.getElementById("search").value.toLowerCase();
-
-log.innerHTML="";
-
-decisions.forEach((d,i)=>{
-
-if(!d.agenda.toLowerCase().includes(search)) return;
-
-log.innerHTML+=`
-
-<div class="card">
-
-<h3>${d.agenda}</h3>
-
-<b>Team:</b> ${d.team}<br>
-<b>Date:</b> ${d.date}<br><br>
-
-<b>Description</b><br>
-${d.description}<br><br>
-
-<b>Pros</b><br>
-${d.pros}<br><br>
-
-<b>Cons</b><br>
-${d.cons}<br>
-
-<div class="summary">
-
-<b>AI Decision Summary</b><br>
-${d.summary}
-
-</div>
-
-<div class="vote">
-
-<button onclick="vote(${i},'up')">👍 ${d.up}</button>
-
-<button onclick="vote(${i},'down')">👎 ${d.down}</button>
-
-<button class="delete" onclick="removeDecision(${i})">Delete</button>
-
-</div>
-
-</div>
-
-`;
-
-});
-
-}
-
-render();
-
-</script>
-
-</body>
-</html>
+<div class="vote-buttons">
+<button class
