@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,68 +8,131 @@
 <link rel="icon" href="DT_20260310_120547_0000.png">
 
 <style>
-
 body{
-font-family: Arial, sans-serif;
-background:#f4f6f8;
-margin:0;
-padding:20px;
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+  padding:20px;
 }
 
 .container{
-max-width:700px;
-margin:0 auto;
+  max-width:760px;
+  margin:0 auto;
 }
 
 .card{
-background:#fff;
-border-radius:20px;
-padding:24px;
-box-shadow:0 6px 18px rgba(0,0,0,0.08);
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+h1,h2,h3{
+  margin-top:0;
 }
 
 h2{
-margin:0 0 20px;
-font-size:28px;
-font-weight:500;
+  margin:0 0 20px;
+  font-size:28px;
+  font-weight:600;
 }
 
 label{
-display:block;
-margin:18px 0 8px;
-font-size:18px;
-font-weight:700;
+  display:block;
+  margin:18px 0 8px;
+  font-size:18px;
+  font-weight:700;
 }
 
 input, textarea, select{
-width:100%;
-box-sizing:border-box;
-border:2px solid #ddd;
-border-radius:14px;
-padding:14px;
-font-size:16px;
-background:#fff;
+  width:100%;
+  box-sizing:border-box;
+  border:2px solid #ddd;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  background:#fff;
 }
 
 textarea{
-min-height:90px;
-resize:vertical;
+  min-height:90px;
+  resize:vertical;
+}
+
+.hidden{
+  display:none !important;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:18px;
+  flex-wrap:wrap;
+}
+
+.user-badge{
+  background:#eef2ff;
+  color:#1e3a8a;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:700;
+}
+
+.login-wrap{
+  max-width:520px;
+  margin:40px auto;
+}
+
+.login-title{
+  font-size:30px;
+  margin-bottom:8px;
+}
+
+.login-desc{
+  color:#555;
+  margin-bottom:20px;
+  line-height:1.5;
+}
+
+.login-actions{
+  display:flex;
+  gap:12px;
+  margin-top:18px;
+}
+
+.login-actions button,
+.vote-buttons button,
+.buttons button,
+.topbar button{
+  border:none;
+  border-radius:14px;
+  padding:14px 16px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.primary{
+  background:#3f6df6;
+  color:#fff;
+}
+
+.secondary{
+  background:#e5e7eb;
+  color:#111;
 }
 
 .vote-buttons{
-display:flex;
-gap:12px;
-margin-top:18px;
+  display:flex;
+  gap:12px;
+  margin-top:18px;
 }
 
 .vote-buttons button{
-flex:1;
-border:none;
-border-radius:14px;
-padding:14px 10px;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
+  flex:1;
+  font-size:18px;
 }
 
 .yes{background:#dff5e5;}
@@ -76,275 +140,530 @@ cursor:pointer;
 .hold{background:#e9e3fa;}
 
 .vote-count{
-display:flex;
-gap:12px;
-margin-top:14px;
+  display:flex;
+  gap:12px;
+  margin-top:14px;
 }
 
 .vote-count span{
-flex:1;
-text-align:center;
-background:#eef0f5;
-border-radius:999px;
-padding:12px 10px;
-font-size:18px;
-font-weight:700;
+  flex:1;
+  text-align:center;
+  background:#eef0f5;
+  border-radius:999px;
+  padding:12px 10px;
+  font-size:18px;
+  font-weight:700;
 }
 
 .buttons{
-display:flex;
-gap:12px;
-margin-top:20px;
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+  flex-wrap:wrap;
+}
+
+.buttons button{
+  flex:1;
+  min-width:140px;
 }
 
 .save{
-flex:1;
-background:#3f6df6;
-color:#fff;
-border:none;
-border-radius:14px;
-padding:16px;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
+  background:#3f6df6;
+  color:#fff;
 }
 
 .clear{
-flex:1;
-background:#e5e7eb;
-color:#111;
-border:none;
-border-radius:14px;
-padding:16px;
-font-size:18px;
-font-weight:700;
-cursor:pointer;
+  background:#e5e7eb;
+  color:#111;
+}
+
+.export{
+  background:#111827;
+  color:#fff;
+}
+
+.share{
+  background:#10b981;
+  color:#fff;
 }
 
 .log-wrap{
-margin-top:24px;
+  margin-top:24px;
+}
+
+.log-tools{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
+}
+
+.log-tools input,
+.log-tools select{
+  flex:1;
+  min-width:180px;
 }
 
 .log-card{
-background:#fff;
-border-radius:18px;
-padding:18px;
-margin-top:14px;
-box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  margin-top:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
 }
 
 .meta{
-color:#555;
-margin-bottom:8px;
+  color:#555;
+  margin-bottom:8px;
+  line-height:1.6;
 }
 
 .small-row{
-margin-top:10px;
-font-size:15px;
+  margin-top:10px;
+  font-size:15px;
+  color:#444;
+  line-height:1.5;
 }
 
+.empty{
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  margin-top:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  color:#666;
+}
+
+.vote-history{
+  margin-top:12px;
+  padding:12px;
+  background:#f8fafc;
+  border-radius:12px;
+  font-size:14px;
+  color:#374151;
+  line-height:1.5;
+}
+
+.notice{
+  margin-top:12px;
+  padding:12px;
+  background:#fff7ed;
+  border:1px solid #fed7aa;
+  color:#9a3412;
+  border-radius:12px;
+  font-size:14px;
+}
+
+@media print {
+  body{
+    background:#fff;
+    padding:0;
+  }
+
+  .topbar,
+  .card,
+  .buttons,
+  .log-tools,
+  #loginScreen{
+    display:none !important;
+  }
+
+  .container{
+    max-width:100%;
+  }
+
+  .log-card,
+  .empty{
+    box-shadow:none;
+    border:1px solid #ddd;
+    break-inside:avoid;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="card">
+    <h1 class="login-title">DecisionTrack Login</h1>
+    <div class="login-desc">
+      Enter your name to use the app.<br>
+      The logged-in name will be used for voting and activity records.
+    </div>
 
-<div class="card">
+    <label>Your Name</label>
+    <input type="text" id="loginName" placeholder="Enter your name">
 
-<h2>New Agenda</h2>
+    <div class="login-actions">
+      <button class="primary" onclick="login()">Login</button>
+    </div>
 
-<label>Meeting Date</label>
-<input type="date" id="meetingDate">
-
-<label>Decision Owner</label>
-<input type="text" id="decisionOwner" placeholder="Owner">
-
-<label>Status</label>
-<select id="status">
-<option>Open</option>
-<option>Done</option>
-</select>
-
-<label>Priority</label>
-<select id="priority">
-<option>Low</option>
-<option>Medium</option>
-<option>High</option>
-</select>
-
-<label>Agenda</label>
-<input id="agenda" type="text">
-
-<label>Team</label>
-<input id="team" type="text">
-
-<label>Description</label>
-<textarea id="description"></textarea>
-
-<label>Pros</label>
-<textarea id="pros"></textarea>
-
-<label>Cons</label>
-<textarea id="cons"></textarea>
-
-<label>Voter</label>
-<input id="voter" type="text">
-
-<div class="vote-buttons">
-<button class="yes" onclick="vote('yes')">👍 Yes</button>
-<button class="no" onclick="vote('no')">👎 No</button>
-<button class="hold" onclick="vote('hold')">⏳ Hold</button>
+    <div class="notice">
+      This is a simple local login structure for MVP use.<br>
+      It is not a real server account system yet.
+    </div>
+  </div>
 </div>
 
-<div class="vote-count">
-<span id="yesCount">Yes 0</span>
-<span id="noCount">No 0</span>
-<span id="holdCount">Hold 0</span>
-</div>
+<!-- APP SCREEN -->
+<div id="appScreen" class="hidden">
+  <div class="container">
 
-<label>Final Decision</label>
-<textarea id="finalDecision"></textarea>
+    <div class="topbar">
+      <div class="user-badge" id="currentUserBadge">Logged in as: -</div>
+      <button class="secondary" onclick="logout()">Logout</button>
+    </div>
 
-<label>Meeting Record</label>
-<textarea id="meetingRecord"></textarea>
+    <div class="card">
+      <h2>New Agenda</h2>
 
-<div class="buttons">
-<button class="save" onclick="saveRecord()">Save Record</button>
-<button class="clear" onclick="clearForm()">Clear</button>
-</div>
+      <label>Meeting Date</label>
+      <input type="date" id="meetingDate">
 
-</div>
+      <label>Decision Owner</label>
+      <input type="text" id="decisionOwner" placeholder="Owner">
 
-<div class="log-wrap">
-<h2>Meeting Decision Log</h2>
-<div id="recordList"></div>
-</div>
+      <label>Status</label>
+      <select id="status">
+        <option>Open</option>
+        <option>Done</option>
+      </select>
 
+      <label>Priority</label>
+      <select id="priority">
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <label>Agenda</label>
+      <input id="agenda" type="text" placeholder="Agenda title">
+
+      <label>Team</label>
+      <input id="team" type="text" placeholder="e.g. Marketing">
+
+      <label>Description</label>
+      <textarea id="description"></textarea>
+
+      <label>Pros</label>
+      <textarea id="pros"></textarea>
+
+      <label>Cons</label>
+      <textarea id="cons"></textarea>
+
+      <div class="notice">
+        Voting uses the currently logged-in user only.<br>
+        Current voter: <b id="currentVoterText">-</b>
+      </div>
+
+      <div class="vote-buttons">
+        <button class="yes" onclick="vote('yes')">👍 Yes</button>
+        <button class="no" onclick="vote('no')">👎 No</button>
+        <button class="hold" onclick="vote('hold')">⏳ Hold</button>
+      </div>
+
+      <div class="vote-count">
+        <span id="yesCount">Yes 0</span>
+        <span id="noCount">No 0</span>
+        <span id="holdCount">Hold 0</span>
+      </div>
+
+      <div class="vote-history" id="voteHistory">Current voters: none</div>
+
+      <label>Final Decision</label>
+      <textarea id="finalDecision"></textarea>
+
+      <label>Meeting Record</label>
+      <textarea id="meetingRecord"></textarea>
+
+      <div class="buttons">
+        <button class="save" onclick="saveRecord()">Save Record</button>
+        <button class="clear" onclick="clearForm()">Clear</button>
+        <button class="export" onclick="exportPDF()">Export PDF</button>
+        <button class="share" onclick="shareApp()">Share</button>
+      </div>
+    </div>
+
+    <div class="log-wrap">
+      <h2>Meeting Decision Log</h2>
+
+      <div class="log-tools">
+        <input
+          id="searchBox"
+          type="text"
+          placeholder="Search agenda / team / decision"
+          oninput="applyFilters()"
+        >
+
+        <select id="teamFilter" onchange="applyFilters()">
+          <option value="">All Teams</option>
+        </select>
+      </div>
+
+      <div id="recordList"></div>
+    </div>
+
+  </div>
 </div>
 
 <script>
+let yes = 0
+let no = 0
+let hold = 0
 
-let yes=0
-let no=0
-let hold=0
+let currentVotes = {}
+let records = JSON.parse(localStorage.getItem("decisiontrack_records")) || []
+let currentUser = localStorage.getItem("decisiontrack_current_user") || ""
 
-let records=JSON.parse(localStorage.getItem("decisiontrack_records"))||[]
+function normalizeName(name){
+  return name.trim().toLowerCase()
+}
+
+function escapeHtml(text){
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;")
+}
+
+function login(){
+  const name = document.getElementById("loginName").value.trim()
+
+  if(name === ""){
+    alert("Please enter your name.")
+    return
+  }
+
+  currentUser = name
+  localStorage.setItem("decisiontrack_current_user", currentUser)
+  updateAuthUI()
+}
+
+function logout(){
+  const ok = confirm("Do you want to logout?")
+  if(!ok) return
+
+  currentUser = ""
+  localStorage.removeItem("decisiontrack_current_user")
+  document.getElementById("loginName").value = ""
+  updateAuthUI()
+}
+
+function updateAuthUI(){
+  const loginScreen = document.getElementById("loginScreen")
+  const appScreen = document.getElementById("appScreen")
+
+  if(currentUser){
+    loginScreen.classList.add("hidden")
+    appScreen.classList.remove("hidden")
+    document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser
+    document.getElementById("currentVoterText").innerText = currentUser
+  }else{
+    loginScreen.classList.remove("hidden")
+    appScreen.classList.add("hidden")
+  }
+}
+
+function updateVoteUI(){
+  document.getElementById("yesCount").innerText = "Yes " + yes
+  document.getElementById("noCount").innerText = "No " + no
+  document.getElementById("holdCount").innerText = "Hold " + hold
+
+  const voters = Object.entries(currentVotes)
+
+  if(voters.length === 0){
+    document.getElementById("voteHistory").innerText = "Current voters: none"
+    return
+  }
+
+  const text = voters.map(([name, type]) => `${name} (${type})`).join(", ")
+  document.getElementById("voteHistory").innerText = "Current voters: " + text
+}
 
 function vote(type){
+  if(!currentUser){
+    alert("Please login first.")
+    return
+  }
 
-if(type==="yes") yes++
-if(type==="no") no++
-if(type==="hold") hold++
+  const voterKey = normalizeName(currentUser)
 
-document.getElementById("yesCount").innerText="Yes "+yes
-document.getElementById("noCount").innerText="No "+no
-document.getElementById("holdCount").innerText="Hold "+hold
+  if(currentVotes[voterKey]){
+    alert("You already voted on this agenda.")
+    return
+  }
 
+  currentVotes[voterKey] = type
+
+  if(type === "yes") yes++
+  if(type === "no") no++
+  if(type === "hold") hold++
+
+  updateVoteUI()
 }
 
 function clearForm(){
+  document.getElementById("agenda").value = ""
+  document.getElementById("team").value = ""
+  document.getElementById("description").value = ""
+  document.getElementById("pros").value = ""
+  document.getElementById("cons").value = ""
+  document.getElementById("finalDecision").value = ""
+  document.getElementById("meetingRecord").value = ""
+  document.getElementById("meetingDate").value = ""
+  document.getElementById("decisionOwner").value = ""
+  document.getElementById("status").value = "Open"
+  document.getElementById("priority").value = "Low"
 
-document.getElementById("agenda").value=""
-document.getElementById("team").value=""
-document.getElementById("description").value=""
-document.getElementById("pros").value=""
-document.getElementById("cons").value=""
-document.getElementById("voter").value=""
-document.getElementById("finalDecision").value=""
-document.getElementById("meetingRecord").value=""
-document.getElementById("meetingDate").value=""
-document.getElementById("decisionOwner").value=""
+  yes = 0
+  no = 0
+  hold = 0
+  currentVotes = {}
 
-yes=0
-no=0
-hold=0
-
-document.getElementById("yesCount").innerText="Yes 0"
-document.getElementById("noCount").innerText="No 0"
-document.getElementById("holdCount").innerText="Hold 0"
-
+  updateVoteUI()
 }
 
 function saveRecord(){
+  if(!currentUser){
+    alert("Please login first.")
+    return
+  }
 
-const record={
+  const record = {
+    meetingDate: document.getElementById("meetingDate").value,
+    owner: document.getElementById("decisionOwner").value,
+    status: document.getElementById("status").value,
+    priority: document.getElementById("priority").value,
+    agenda: document.getElementById("agenda").value,
+    team: document.getElementById("team").value,
+    description: document.getElementById("description").value,
+    pros: document.getElementById("pros").value,
+    cons: document.getElementById("cons").value,
+    finalDecision: document.getElementById("finalDecision").value,
+    meetingRecord: document.getElementById("meetingRecord").value,
+    yes,
+    no,
+    hold,
+    voters: currentVotes,
+    createdBy: currentUser,
+    date: new Date().toLocaleString()
+  }
 
-meetingDate:document.getElementById("meetingDate").value,
-owner:document.getElementById("decisionOwner").value,
-status:document.getElementById("status").value,
-priority:document.getElementById("priority").value,
+  records.unshift(record)
 
-agenda:document.getElementById("agenda").value,
-team:document.getElementById("team").value,
-description:document.getElementById("description").value,
-pros:document.getElementById("pros").value,
-cons:document.getElementById("cons").value,
-voter:document.getElementById("voter").value,
+  localStorage.setItem(
+    "decisiontrack_records",
+    JSON.stringify(records)
+  )
 
-finalDecision:document.getElementById("finalDecision").value,
-meetingRecord:document.getElementById("meetingRecord").value,
-
-yes,
-no,
-hold,
-
-date:new Date().toLocaleString()
-
+  updateTeamFilter()
+  applyFilters()
+  clearForm()
 }
 
-records.unshift(record)
+function renderFiltered(list){
+  const container = document.getElementById("recordList")
 
-localStorage.setItem(
-"decisiontrack_records",
-JSON.stringify(records)
-)
+  if(list.length === 0){
+    container.innerHTML = `<div class="empty">No matching records found.</div>`
+    return
+  }
 
-renderRecords()
+  container.innerHTML = list.map(r => {
+    const voterEntries = r.voters
+      ? Object.entries(r.voters).map(([name, type]) => `${escapeHtml(name)} (${escapeHtml(type)})`).join(", ")
+      : "-"
 
-clearForm()
+    return `
+      <div class="log-card">
+        <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
 
+        <div class="meta">
+          Team: ${escapeHtml(r.team || "-")} |
+          Owner: ${escapeHtml(r.owner || "-")} |
+          Priority: ${escapeHtml(r.priority || "-")} |
+          Status: ${escapeHtml(r.status || "-")}
+        </div>
+
+        <div class="small-row"><b>Meeting Date:</b> ${escapeHtml(r.meetingDate || "-")}</div>
+        <div class="small-row"><b>Description:</b> ${escapeHtml(r.description || "-")}</div>
+        <div class="small-row"><b>Pros:</b> ${escapeHtml(r.pros || "-")}</div>
+        <div class="small-row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
+        <div class="small-row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
+        <div class="small-row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
+        <div class="small-row"><b>Votes:</b> Yes ${r.yes} / No ${r.no} / Hold ${r.hold}</div>
+        <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
+        <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
+        <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
+      </div>
+    `
+  }).join("")
 }
 
-function renderRecords(){
+function applyFilters(){
+  const keyword = document.getElementById("searchBox").value.toLowerCase().trim()
+  const selectedTeam = document.getElementById("teamFilter").value
 
-const list=document.getElementById("recordList")
+  const filtered = records.filter(r => {
+    const matchesKeyword =
+      (r.agenda || "").toLowerCase().includes(keyword) ||
+      (r.team || "").toLowerCase().includes(keyword) ||
+      (r.finalDecision || "").toLowerCase().includes(keyword)
 
-list.innerHTML=records.map(r=>`
+    const matchesTeam =
+      selectedTeam === "" || (r.team || "") === selectedTeam
 
-<div class="log-card">
+    return matchesKeyword && matchesTeam
+  })
 
-<h3>${r.agenda||"(No Agenda)"}</h3>
-
-<div class="meta">
-
-Team: ${r.team||"-"} |
-Owner: ${r.owner||"-"} |
-Priority: ${r.priority||"-"} |
-Status: ${r.status||"-"}
-
-</div>
-
-<div class="small-row">
-Meeting Date: ${r.meetingDate||"-"}
-</div>
-
-<div>
-<b>Decision:</b> ${r.finalDecision||"-"}
-</div>
-
-<div class="small-row">
-<b>Votes:</b> Yes ${r.yes} / No ${r.no} / Hold ${r.hold}
-</div>
-
-</div>
-
-`).join("")
-
+  renderFiltered(filtered)
 }
 
-renderRecords()
+function updateTeamFilter(){
+  const teamFilter = document.getElementById("teamFilter")
+  const currentValue = teamFilter.value
 
+  const teams = [...new Set(
+    records
+      .map(r => (r.team || "").trim())
+      .filter(team => team !== "")
+  )].sort()
+
+  teamFilter.innerHTML =
+    `<option value="">All Teams</option>` +
+    teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("")
+
+  if(teams.includes(currentValue)){
+    teamFilter.value = currentValue
+  }else{
+    teamFilter.value = ""
+  }
+}
+
+function exportPDF(){
+  window.print()
+}
+
+function shareApp(){
+  if(navigator.share){
+    navigator.share({
+      title: "DecisionTrack",
+      text: "DecisionTrack app",
+      url: window.location.href
+    }).catch(() => {})
+  }else{
+    alert("Sharing is not supported on this device/browser.")
+  }
+}
+
+updateAuthUI()
+updateTeamFilter()
+updateVoteUI()
+applyFilters()
 </script>
 
 </body>
