@@ -1,140 +1,260 @@
+
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecisionTrack</title>
-
 <style>
-
 body{
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
-background:#f4f6f8;
-padding:20px;
+  font-family: Arial, sans-serif;
+  background:#f4f6f8;
+  margin:0;
+  padding:20px;
 }
-
 .container{
-max-width:600px;
-margin:auto;
+  max-width:700px;
+  margin:0 auto;
 }
-
 .card{
-background:white;
-padding:25px;
-border-radius:14px;
-box-shadow:0 6px 20px rgba(0,0,0,0.08);
-margin-bottom:20px;
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
-
 h1{
-margin-bottom:20px;
+  margin:0 0 20px;
+  font-size:32px;
 }
-
+h2{
+  margin:0 0 20px;
+  font-size:28px;
+  font-weight:500;
+}
 label{
-font-weight:600;
-margin-top:12px;
-display:block;
+  display:block;
+  margin:18px 0 8px;
+  font-size:18px;
+  font-weight:700;
 }
-
-input,textarea{
-width:100%;
-padding:10px;
-margin-top:6px;
-border-radius:8px;
-border:1px solid #ddd;
+input, textarea{
+  width:100%;
+  box-sizing:border-box;
+  border:2px solid #ddd;
+  border-radius:14px;
+  padding:14px;
+  font-size:16px;
+  background:#fff;
 }
-
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
 .vote-buttons{
-display:flex;
-gap:10px;
-margin-top:15px;
+  display:flex;
+  gap:12px;
+  margin-top:18px;
 }
-
 .vote-buttons button{
-flex:1;
-padding:12px;
-border:none;
-border-radius:10px;
-font-size:16px;
-cursor:pointer;
+  flex:1;
+  border:none;
+  border-radius:14px;
+  padding:14px 10px;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
 }
+.yes{ background:#dff5e5; }
+.no{ background:#f8dddd; }
+.hold{ background:#e9e3fa; }
 
-.yes{
-background:#dff5e5;
+.vote-count{
+  display:flex;
+  gap:12px;
+  margin-top:14px;
 }
-
-.no{
-background:#ffdede;
+.vote-count span{
+  flex:1;
+  text-align:center;
+  background:#eef0f5;
+  border-radius:999px;
+  padding:12px 10px;
+  font-size:18px;
+  font-weight:700;
 }
-
-.hold{
-background:#e8e4ff;
+.buttons{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
 }
-
-.count{
-display:flex;
-justify-content:space-between;
-margin-top:10px;
-font-weight:600;
-}
-
-.decision-box{
-border:2px solid #d6a54a;
-border-radius:12px;
-padding:15px;
-margin-top:10px;
-}
-
 .save{
-background:#3b6eea;
-color:white;
-padding:12px;
-border:none;
-border-radius:10px;
-margin-top:15px;
-cursor:pointer;
+  flex:1;
+  background:#3f6df6;
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
 }
-
 .clear{
-background:#ddd;
-padding:12px;
-border:none;
-border-radius:10px;
-margin-top:15px;
-margin-left:10px;
-cursor:pointer;
+  flex:1;
+  background:#e5e7eb;
+  color:#111;
+  border:none;
+  border-radius:14px;
+  padding:16px;
+  font-size:18px;
+  font-weight:700;
+  cursor:pointer;
 }
-
+.log-wrap{
+  margin-top:24px;
+}
+.log-card{
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  margin-top:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+.log-card h3{
+  margin:0 0 10px;
+}
+.meta{
+  color:#555;
+  margin-bottom:8px;
+}
+.small-row{
+  margin-top:10px;
+  font-size:15px;
+}
 </style>
 </head>
-
 <body>
-
 <div class="container">
+  <div class="card">
+    <h2>New Agenda</h2>
 
-<h1>DecisionTrack</h1>
+    <label>Agenda</label>
+    <input id="agenda" type="text">
 
-<div class="card">
+    <label>Team</label>
+    <input id="team" type="text">
 
-<h2>New Agenda</h2>
+    <label>Description</label>
+    <textarea id="description"></textarea>
 
-<label>안건</label>
-<input id="agenda">
+    <label>Pros</label>
+    <textarea id="pros"></textarea>
 
-<label>팀</label>
-<input id="team">
+    <label>Cons</label>
+    <textarea id="cons"></textarea>
 
-<label>설명</label>
-<textarea id="desc"></textarea>
+    <label>Voter</label>
+    <input id="voter" type="text">
 
-<label>찬성 의견</label>
-<textarea id="pros"></textarea>
+    <div class="vote-buttons">
+      <button class="yes" onclick="vote('yes')">👍 Yes</button>
+      <button class="no" onclick="vote('no')">👎 No</button>
+      <button class="hold" onclick="vote('hold')">⏳ Hold</button>
+    </div>
 
-<label>반대 의견</label>
-<textarea id="cons"></textarea>
+    <div class="vote-count">
+      <span id="yesCount">Yes 0</span>
+      <span id="noCount">No 0</span>
+      <span id="holdCount">Hold 0</span>
+    </div>
 
-<label>투표자</label>
-<input id="voter">
+    <label>Final Decision</label>
+    <textarea id="finalDecision"></textarea>
 
-<div class="vote-buttons">
-<button class
+    <label>Meeting Record</label>
+    <textarea id="meetingRecord"></textarea>
+
+    <div class="buttons">
+      <button class="save" onclick="saveRecord()">Save Record</button>
+      <button class="clear" onclick="clearForm()">Clear</button>
+    </div>
+  </div>
+
+  <div class="log-wrap">
+    <h2>Meeting Decision Log</h2>
+    <div id="recordList"></div>
+  </div>
+</div>
+
+<script>
+let yes = 0;
+let no = 0;
+let hold = 0;
+let records = JSON.parse(localStorage.getItem("decisiontrack_records")) || [];
+
+function vote(type){
+  if(type === "yes") yes++;
+  if(type === "no") no++;
+  if(type === "hold") hold++;
+
+  document.getElementById("yesCount").innerText = "Yes " + yes;
+  document.getElementById("noCount").innerText = "No " + no;
+  document.getElementById("holdCount").innerText = "Hold " + hold;
+}
+
+function clearForm(){
+  document.getElementById("agenda").value = "";
+  document.getElementById("team").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("pros").value = "";
+  document.getElementById("cons").value = "";
+  document.getElementById("voter").value = "";
+  document.getElementById("finalDecision").value = "";
+  document.getElementById("meetingRecord").value = "";
+
+  yes = 0;
+  no = 0;
+  hold = 0;
+
+  document.getElementById("yesCount").innerText = "Yes 0";
+  document.getElementById("noCount").innerText = "No 0";
+  document.getElementById("holdCount").innerText = "Hold 0";
+}
+
+function saveRecord(){
+  const record = {
+    agenda: document.getElementById("agenda").value,
+    team: document.getElementById("team").value,
+    description: document.getElementById("description").value,
+    pros: document.getElementById("pros").value,
+    cons: document.getElementById("cons").value,
+    voter: document.getElementById("voter").value,
+    finalDecision: document.getElementById("finalDecision").value,
+    meetingRecord: document.getElementById("meetingRecord").value,
+    yes,
+    no,
+    hold,
+    date: new Date().toLocaleString()
+  };
+
+  records.unshift(record);
+  localStorage.setItem("decisiontrack_records", JSON.stringify(records));
+  renderRecords();
+  clearForm();
+}
+
+function renderRecords(){
+  const list = document.getElementById("recordList");
+  list.innerHTML = records.map(r => `
+    <div class="log-card">
+      <h3>${r.agenda || "(No Agenda)"}</h3>
+      <div class="meta">Team: ${r.team || "-"} | ${r.date}</div>
+      <div><b>Decision:</b> ${r.finalDecision || "-"}</div>
+      <div class="small-row"><b>Votes:</b> Yes ${r.yes} / No ${r.no} / Hold ${r.hold}</div>
+    </div>
+  `).join("");
+}
+
+renderRecords();
+</script>
+</body>
+</html>
