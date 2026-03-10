@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -136,6 +136,17 @@
       white-space:pre-line;
     }
 
+    .auth-help{
+      margin-top:14px;
+      padding:12px;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      color:#475569;
+      border-radius:12px;
+      font-size:13px;
+      line-height:1.6;
+    }
+
     .scope-box{
       margin-bottom:16px;
       padding:12px;
@@ -245,7 +256,6 @@
       font-size:13px;
     }
 
-    /* PDF capture area */
     #pdfCaptureArea{
       position:absolute;
       left:-99999px;
@@ -415,6 +425,11 @@
       </div>
     </div>
 
+    <div class="auth-help">
+      DecisionTrack helps teams record agendas, votes, decisions, and meeting notes in one place.<br><br>
+      Email verification may be delayed on some providers. Gmail is recommended for faster signup.
+    </div>
+
     <div id="authMessage" class="hidden"></div>
   </div>
 
@@ -516,7 +531,6 @@
 
 </div>
 
-<!-- Hidden PDF Capture Area -->
 <div id="pdfCaptureArea" aria-hidden="true"></div>
 
 <script type="module">
@@ -1400,4 +1414,4 @@ Saved: ${escapeHtml(record.date || "-")}
 </script>
 
 </body>
-</html>
+</html>  
