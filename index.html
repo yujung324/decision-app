@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,10 +89,10 @@ border:1px solid #eee;
 
 <h3>Login</h3>
 
-<input id="authName" placeholder="이름">
-<input id="authPassword" type="password" placeholder="비밀번호">
+<input id="authName" placeholder="Name">
+<input id="authPassword" type="password" placeholder="Password">
 
-<button class="primary" onclick="signUp()">SignUp</button>
+<button class="primary" onclick="signUp()">Sign Up</button>
 <button class="secondary" onclick="login()">Login</button>
 
 </div>
@@ -103,44 +103,44 @@ border:1px solid #eee;
 
 <h3>New Agenda</h3>
 
-<label>안건</label>
+<label>Agenda</label>
 <input id="topic">
 
-<label>팀</label>
+<label>Team</label>
 <input id="team">
 
-<label>설명</label>
+<label>Description</label>
 <textarea id="description"></textarea>
 
-<label>찬성 의견</label>
+<label>Pros</label>
 <textarea id="pros"></textarea>
 
-<label>반대 의견</label>
+<label>Cons</label>
 <textarea id="cons"></textarea>
 
-<label>투표자</label>
+<label>Voter</label>
 <input id="voterName">
 
 <div>
 
-<button class="vote-btn vote-for" onclick="addVote('찬성')">👍 찬성</button>
-<button class="vote-btn vote-against" onclick="addVote('반대')">👎 반대</button>
-<button class="vote-btn vote-hold" onclick="addVote('보류')">⏳ 보류</button>
+<button class="vote-btn vote-for" onclick="addVote('Approve')">👍 Approve</button>
+<button class="vote-btn vote-against" onclick="addVote('Reject')">👎 Reject</button>
+<button class="vote-btn vote-hold" onclick="addVote('Hold')">⏳ Hold</button>
 
 </div>
 
 <div>
 
-<span class="vote-pill">찬성 <span id="voteForCount">0</span></span>
-<span class="vote-pill">반대 <span id="voteAgainstCount">0</span></span>
-<span class="vote-pill">보류 <span id="voteHoldCount">0</span></span>
+<span class="vote-pill">Approve <span id="voteForCount">0</span></span>
+<span class="vote-pill">Reject <span id="voteAgainstCount">0</span></span>
+<span class="vote-pill">Hold <span id="voteHoldCount">0</span></span>
 
 </div>
 
-<label>최종 결정</label>
+<label>Final Decision</label>
 <textarea id="decision"></textarea>
 
-<label>회의 기록</label>
+<label>Meeting Notes</label>
 <textarea id="meetingNotes"></textarea>
 
 <button class="primary" onclick="saveAgenda()">Save Record</button>
@@ -176,7 +176,7 @@ users.push({name,password})
 
 localStorage.setItem("users",JSON.stringify(users))
 
-alert("회원가입 완료")
+alert("Sign up completed")
 
 }
 
@@ -188,7 +188,7 @@ const password=document.getElementById("authPassword").value
 const user=users.find(u=>u.name===name&&u.password===password)
 
 if(!user){
-alert("로그인 실패")
+alert("Login failed")
 return
 }
 
@@ -216,9 +216,9 @@ renderVotes()
 
 function renderVotes(){
 
-document.getElementById("voteForCount").innerText=votes.filter(v=>v.type==="찬성").length
-document.getElementById("voteAgainstCount").innerText=votes.filter(v=>v.type==="반대").length
-document.getElementById("voteHoldCount").innerText=votes.filter(v=>v.type==="보류").length
+document.getElementById("voteForCount").innerText=votes.filter(v=>v.type==="Approve").length
+document.getElementById("voteAgainstCount").innerText=votes.filter(v=>v.type==="Reject").length
+document.getElementById("voteHoldCount").innerText=votes.filter(v=>v.type==="Hold").length
 
 }
 
@@ -258,11 +258,11 @@ try{
 
 await addDoc(collection(db,"decisionLogs"),record)
 
-console.log("Firebase 저장 완료")
+console.log("Saved to Firebase")
 
 }catch(e){
 
-console.log("Firebase 저장 실패")
+console.log("Firebase save failed")
 
 }
 
@@ -297,8 +297,8 @@ list.innerHTML=records.map(r=>`
 
 <b>${r.topic}</b>
 
-<div>팀: ${r.team}</div>
-<div>결정: ${r.decision}</div>
+<div>Team: ${r.team}</div>
+<div>Decision: ${r.decision}</div>
 
 </div>
 
@@ -307,7 +307,6 @@ list.innerHTML=records.map(r=>`
 }
 
 </script>
-
 
 <script type="module">
 
@@ -330,7 +329,7 @@ window.db=db
 window.addDoc=addDoc
 window.collection=collection
 
-console.log("Firebase 연결 완료")
+console.log("Firebase connected")
 
 </script>
 
