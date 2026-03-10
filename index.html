@@ -223,8 +223,8 @@
       </div>
 
       <div class="notice">
-        New accounts are created as member.
-        Leader must be changed manually in Firestore: users/{uid}.role = leader
+        New accounts are automatically saved to Firestore users collection.
+        New signups are created as leader in this version.
       </div>
     </div>
 
@@ -456,21 +456,27 @@
 
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
-        email,
-        name,
-        company,
-        team,
-        scopeKey: getScopeKey(company, team),
-        role: "member",
+        email: email,
+        name: name,
+        company: company,
+        team: team,
+        scopeKey: company.toLowerCase() + "__" + team,
+        role: "leader",
         createdAt: serverTimestamp()
       });
 
       await sendEmailVerification(user);
       await signOut(auth);
 
-      showMessage("authMessage", "Account created. Verification email sent. Verify email first, then login.", "success");
+      showMessage(
+        "authMessage",
+        "Account created. Verification email sent. Verify email first, then login.",
+        "success"
+      );
+
       switchTab("login");
       document.getElementById("loginEmail").value = email;
+
     }catch(error){
       console.error(error);
       showMessage("authMessage", formatError(error));
