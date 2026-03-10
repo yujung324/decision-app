@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -408,17 +407,43 @@ textarea{
   </div>
 </div>
 
-<script>
-let yes = 0
-let no = 0
-let hold = 0
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-let currentVotes = {}
-let records = JSON.parse(localStorage.getItem("decisiontrack_records")) || []
-let currentUser = localStorage.getItem("decisiontrack_current_user") || ""
+/* ===== 여기에 아르카 Firebase 값 넣기 ===== */
+const firebaseConfig = {
+  apiKey: "여기아르카코드",
+  authDomain: "여기아르카코드",
+  projectId: "여기아르카코드",
+  storageBucket: "여기아르카코드",
+  messagingSenderId: "여기아르카코드",
+  appId: "여기아르카코드"
+};
+/* ======================================= */
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const recordsRef = collection(db, "decisionLogs");
+
+let yes = 0;
+let no = 0;
+let hold = 0;
+
+let currentVotes = {};
+let records = [];
+let currentUser = localStorage.getItem("decisiontrack_current_user") || "";
 
 function normalizeName(name){
-  return name.trim().toLowerCase()
+  return name.trim().toLowerCase();
 }
 
 function escapeHtml(text){
@@ -427,110 +452,110 @@ function escapeHtml(text){
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;")
+    .replace(/'/g, "&#039;");
 }
 
 function login(){
-  const name = document.getElementById("loginName").value.trim()
+  const name = document.getElementById("loginName").value.trim();
 
   if(name === ""){
-    alert("Please enter your name.")
-    return
+    alert("Please enter your name.");
+    return;
   }
 
-  currentUser = name
-  localStorage.setItem("decisiontrack_current_user", currentUser)
-  updateAuthUI()
+  currentUser = name;
+  localStorage.setItem("decisiontrack_current_user", currentUser);
+  updateAuthUI();
 }
 
 function logout(){
-  const ok = confirm("Do you want to logout?")
-  if(!ok) return
+  const ok = confirm("Do you want to logout?");
+  if(!ok) return;
 
-  currentUser = ""
-  localStorage.removeItem("decisiontrack_current_user")
-  document.getElementById("loginName").value = ""
-  updateAuthUI()
+  currentUser = "";
+  localStorage.removeItem("decisiontrack_current_user");
+  document.getElementById("loginName").value = "";
+  updateAuthUI();
 }
 
 function updateAuthUI(){
-  const loginScreen = document.getElementById("loginScreen")
-  const appScreen = document.getElementById("appScreen")
+  const loginScreen = document.getElementById("loginScreen");
+  const appScreen = document.getElementById("appScreen");
 
   if(currentUser){
-    loginScreen.classList.add("hidden")
-    appScreen.classList.remove("hidden")
-    document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser
-    document.getElementById("currentVoterText").innerText = currentUser
+    loginScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
+    document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser;
+    document.getElementById("currentVoterText").innerText = currentUser;
   }else{
-    loginScreen.classList.remove("hidden")
-    appScreen.classList.add("hidden")
+    loginScreen.classList.remove("hidden");
+    appScreen.classList.add("hidden");
   }
 }
 
 function updateVoteUI(){
-  document.getElementById("yesCount").innerText = "Yes " + yes
-  document.getElementById("noCount").innerText = "No " + no
-  document.getElementById("holdCount").innerText = "Hold " + hold
+  document.getElementById("yesCount").innerText = "Yes " + yes;
+  document.getElementById("noCount").innerText = "No " + no;
+  document.getElementById("holdCount").innerText = "Hold " + hold;
 
-  const voters = Object.entries(currentVotes)
+  const voters = Object.entries(currentVotes);
 
   if(voters.length === 0){
-    document.getElementById("voteHistory").innerText = "Current voters: none"
-    return
+    document.getElementById("voteHistory").innerText = "Current voters: none";
+    return;
   }
 
-  const text = voters.map(([name, type]) => `${name} (${type})`).join(", ")
-  document.getElementById("voteHistory").innerText = "Current voters: " + text
+  const text = voters.map(([name, type]) => `${name} (${type})`).join(", ");
+  document.getElementById("voteHistory").innerText = "Current voters: " + text;
 }
 
 function vote(type){
   if(!currentUser){
-    alert("Please login first.")
-    return
+    alert("Please login first.");
+    return;
   }
 
-  const voterKey = normalizeName(currentUser)
+  const voterKey = normalizeName(currentUser);
 
   if(currentVotes[voterKey]){
-    alert("You already voted on this agenda.")
-    return
+    alert("You already voted on this agenda.");
+    return;
   }
 
-  currentVotes[voterKey] = type
+  currentVotes[voterKey] = type;
 
-  if(type === "yes") yes++
-  if(type === "no") no++
-  if(type === "hold") hold++
+  if(type === "yes") yes++;
+  if(type === "no") no++;
+  if(type === "hold") hold++;
 
-  updateVoteUI()
+  updateVoteUI();
 }
 
 function clearForm(){
-  document.getElementById("agenda").value = ""
-  document.getElementById("team").value = ""
-  document.getElementById("description").value = ""
-  document.getElementById("pros").value = ""
-  document.getElementById("cons").value = ""
-  document.getElementById("finalDecision").value = ""
-  document.getElementById("meetingRecord").value = ""
-  document.getElementById("meetingDate").value = ""
-  document.getElementById("decisionOwner").value = ""
-  document.getElementById("status").value = "Open"
-  document.getElementById("priority").value = "Low"
+  document.getElementById("agenda").value = "";
+  document.getElementById("team").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("pros").value = "";
+  document.getElementById("cons").value = "";
+  document.getElementById("finalDecision").value = "";
+  document.getElementById("meetingRecord").value = "";
+  document.getElementById("meetingDate").value = "";
+  document.getElementById("decisionOwner").value = "";
+  document.getElementById("status").value = "Open";
+  document.getElementById("priority").value = "Low";
 
-  yes = 0
-  no = 0
-  hold = 0
-  currentVotes = {}
+  yes = 0;
+  no = 0;
+  hold = 0;
+  currentVotes = {};
 
-  updateVoteUI()
+  updateVoteUI();
 }
 
-function saveRecord(){
+async function saveRecord(){
   if(!currentUser){
-    alert("Please login first.")
-    return
+    alert("Please login first.");
+    return;
   }
 
   const record = {
@@ -550,33 +575,31 @@ function saveRecord(){
     hold,
     voters: currentVotes,
     createdBy: currentUser,
-    date: new Date().toLocaleString()
+    date: new Date().toLocaleString(),
+    createdAt: serverTimestamp()
+  };
+
+  try{
+    await addDoc(recordsRef, record);
+    clearForm();
+  }catch(error){
+    console.error(error);
+    alert("Save failed. Check Firebase config or Firestore rules.");
   }
-
-  records.unshift(record)
-
-  localStorage.setItem(
-    "decisiontrack_records",
-    JSON.stringify(records)
-  )
-
-  updateTeamFilter()
-  applyFilters()
-  clearForm()
 }
 
 function renderFiltered(list){
-  const container = document.getElementById("recordList")
+  const container = document.getElementById("recordList");
 
   if(list.length === 0){
-    container.innerHTML = `<div class="empty">No matching records found.</div>`
-    return
+    container.innerHTML = `<div class="empty">No matching records found.</div>`;
+    return;
   }
 
   container.innerHTML = list.map(r => {
     const voterEntries = r.voters
       ? Object.entries(r.voters).map(([name, type]) => `${escapeHtml(name)} (${escapeHtml(type)})`).join(", ")
-      : "-"
+      : "-";
 
     return `
       <div class="log-card">
@@ -595,57 +618,57 @@ function renderFiltered(list){
         <div class="small-row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
         <div class="small-row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
         <div class="small-row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
-        <div class="small-row"><b>Votes:</b> Yes ${r.yes} / No ${r.no} / Hold ${r.hold}</div>
+        <div class="small-row"><b>Votes:</b> Yes ${r.yes ?? 0} / No ${r.no ?? 0} / Hold ${r.hold ?? 0}</div>
         <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
         <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
         <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
       </div>
-    `
-  }).join("")
+    `;
+  }).join("");
 }
 
 function applyFilters(){
-  const keyword = document.getElementById("searchBox").value.toLowerCase().trim()
-  const selectedTeam = document.getElementById("teamFilter").value
+  const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
+  const selectedTeam = document.getElementById("teamFilter").value;
 
   const filtered = records.filter(r => {
     const matchesKeyword =
       (r.agenda || "").toLowerCase().includes(keyword) ||
       (r.team || "").toLowerCase().includes(keyword) ||
-      (r.finalDecision || "").toLowerCase().includes(keyword)
+      (r.finalDecision || "").toLowerCase().includes(keyword);
 
     const matchesTeam =
-      selectedTeam === "" || (r.team || "") === selectedTeam
+      selectedTeam === "" || (r.team || "") === selectedTeam;
 
-    return matchesKeyword && matchesTeam
-  })
+    return matchesKeyword && matchesTeam;
+  });
 
-  renderFiltered(filtered)
+  renderFiltered(filtered);
 }
 
 function updateTeamFilter(){
-  const teamFilter = document.getElementById("teamFilter")
-  const currentValue = teamFilter.value
+  const teamFilter = document.getElementById("teamFilter");
+  const currentValue = teamFilter.value;
 
   const teams = [...new Set(
     records
       .map(r => (r.team || "").trim())
       .filter(team => team !== "")
-  )].sort()
+  )].sort();
 
   teamFilter.innerHTML =
     `<option value="">All Teams</option>` +
-    teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("")
+    teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("");
 
   if(teams.includes(currentValue)){
-    teamFilter.value = currentValue
+    teamFilter.value = currentValue;
   }else{
-    teamFilter.value = ""
+    teamFilter.value = "";
   }
 }
 
 function exportPDF(){
-  window.print()
+  window.print();
 }
 
 function shareApp(){
@@ -654,16 +677,41 @@ function shareApp(){
       title: "DecisionTrack",
       text: "DecisionTrack app",
       url: window.location.href
-    }).catch(() => {})
+    }).catch(() => {});
   }else{
-    alert("Sharing is not supported on this device/browser.")
+    alert("Sharing is not supported on this device/browser.");
   }
 }
 
-updateAuthUI()
-updateTeamFilter()
-updateVoteUI()
-applyFilters()
+/* 실시간 Firestore 읽기 */
+const q = query(recordsRef, orderBy("createdAt", "desc"));
+
+onSnapshot(q, (snapshot) => {
+  records = snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  }));
+
+  updateTeamFilter();
+  applyFilters();
+}, (error) => {
+  console.error(error);
+});
+
+/* inline onclick용으로 window에 연결 */
+window.login = login;
+window.logout = logout;
+window.vote = vote;
+window.clearForm = clearForm;
+window.saveRecord = saveRecord;
+window.applyFilters = applyFilters;
+window.exportPDF = exportPDF;
+window.shareApp = shareApp;
+
+updateAuthUI();
+updateVoteUI();
+updateTeamFilter();
+applyFilters();
 </script>
 
 </body>
