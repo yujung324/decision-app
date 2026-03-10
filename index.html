@@ -61,7 +61,9 @@
     .tabs,
     .actions,
     .topbar,
-    .record-actions{
+    .record-actions,
+    .vote-buttons,
+    .vote-count{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
@@ -186,6 +188,37 @@
       box-shadow:0 4px 12px rgba(0,0,0,0.06);
       color:#666;
     }
+
+    .vote-buttons button{
+      flex:1;
+      min-width:120px;
+    }
+
+    .yes{ background:#dff5e5; color:#14532d; }
+    .no{ background:#f8dddd; color:#7f1d1d; }
+    .hold{ background:#e9e3fa; color:#4c1d95; }
+
+    .vote-count span{
+      flex:1;
+      min-width:120px;
+      text-align:center;
+      background:#eef0f5;
+      border-radius:999px;
+      padding:10px 12px;
+      font-weight:700;
+    }
+
+    .vote-history{
+      margin-top:12px;
+      padding:12px;
+      background:#f8fafc;
+      border-radius:12px;
+      font-size:14px;
+      color:#374151;
+      line-height:1.5;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
   </style>
 </head>
 <body>
@@ -299,6 +332,25 @@
       <label>Cons</label>
       <textarea id="cons"></textarea>
 
+      <div class="notice">
+        Draft voting below is optional before saving the agenda.
+        After saving, everyone in the same company/team can vote directly on the saved agenda card.
+      </div>
+
+      <div class="vote-buttons">
+        <button class="yes" onclick="voteDraft('yes')">👍 Yes</button>
+        <button class="no" onclick="voteDraft('no')">👎 No</button>
+        <button class="hold" onclick="voteDraft('hold')">⏳ Hold</button>
+      </div>
+
+      <div class="vote-count">
+        <span id="yesCount">Yes 0</span>
+        <span id="noCount">No 0</span>
+        <span id="holdCount">Hold 0</span>
+      </div>
+
+      <div class="vote-history" id="draftVoteHistory">Draft voters: none</div>
+
       <label>Final Decision</label>
       <textarea id="finalDecision"></textarea>
 
@@ -355,7 +407,8 @@
     getDoc,
     setDoc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    increment
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -377,6 +430,11 @@
   let records = [];
   let unsubscribeRecords = null;
 
+  let draftYes = 0;
+  let draftNo = 0;
+  let draftHold = 0;
+  let draftVotes = {};
+
   function normalizeName(name){
     return String(name || "")
       .trim()
@@ -396,6 +454,11 @@
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function getCurrentVoterKey(){
+    if(!auth.currentUser || !currentUserProfile) return "";
+    return `${auth.currentUser.uid}__${normalizeName(currentUserProfile.name)}`;
   }
 
   function showMessage(id, text, type="notice"){
@@ -434,6 +497,48 @@
     }
 
     hideMessage("authMessage");
+  }
+
+  function updateDraftVoteUI(){
+    document.getElementById("yesCount").innerText = `Yes ${draftYes}`;
+    document.getElementById("noCount").innerText = `No ${draftNo}`;
+    document.getElementById("holdCount").innerText = `Hold ${draftHold}`;
+
+    const voters = Object.values(draftVotes);
+    if(voters.length === 0){
+      document.getElementById("draftVoteHistory").innerText = "Draft voters: none";
+      return;
+    }
+
+    const text = voters.map(v => `${v.name} (${v.type})`).join(", ");
+    document.getElementById("draftVoteHistory").innerText = "Draft voters: " + text;
+  }
+
+  function voteDraft(type){
+    if(!auth.currentUser || !currentUserProfile){
+      alert("Please login first.");
+      return;
+    }
+
+    const voterKey = getCurrentVoterKey();
+    if(!voterKey) return;
+
+    if(draftVotes[voterKey]){
+      alert("You already voted on this draft agenda.");
+      return;
+    }
+
+    draftVotes[voterKey] = {
+      uid: auth.currentUser.uid,
+      name: currentUserProfile.name,
+      type
+    };
+
+    if(type === "yes") draftYes++;
+    if(type === "no") draftNo++;
+    if(type === "hold") draftHold++;
+
+    updateDraftVoteUI();
   }
 
   async function signUp(){
@@ -496,10 +601,11 @@
 
     try{
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      await cred.user.reload();
 
       if(!cred.user.emailVerified){
-        await signOut(auth);
         showMessage("authMessage", "Email is not verified yet.");
+        await signOut(auth);
         return;
       }
     }catch(error){
@@ -589,6 +695,12 @@ Role: ${currentUserProfile.role}`;
     document.getElementById("finalDecision").value = "";
     document.getElementById("meetingRecord").value = "";
 
+    draftYes = 0;
+    draftNo = 0;
+    draftHold = 0;
+    draftVotes = {};
+    updateDraftVoteUI();
+
     hideMessage("formMessage");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -623,6 +735,10 @@ Role: ${currentUserProfile.role}`;
       cons: document.getElementById("cons").value.trim(),
       finalDecision: document.getElementById("finalDecision").value.trim(),
       meetingRecord: document.getElementById("meetingRecord").value.trim(),
+      yes: draftYes,
+      no: draftNo,
+      hold: draftHold,
+      voters: draftVotes,
       updatedAt: serverTimestamp(),
       updatedByUid: auth.currentUser.uid,
       updatedByName: currentUserProfile.name
@@ -689,6 +805,12 @@ Role: ${currentUserProfile.role}`;
     document.getElementById("finalDecision").value = record.finalDecision || "";
     document.getElementById("meetingRecord").value = record.meetingRecord || "";
 
+    draftYes = record.yes || 0;
+    draftNo = record.no || 0;
+    draftHold = record.hold || 0;
+    draftVotes = record.voters || {};
+    updateDraftVoteUI();
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -721,6 +843,55 @@ Role: ${currentUserProfile.role}`;
     }
   }
 
+  async function voteAgenda(id, type){
+    if(!auth.currentUser || !currentUserProfile){
+      alert("Please login first.");
+      return;
+    }
+
+    const record = records.find(r => r.id === id);
+    if(!record){
+      alert("Agenda not found.");
+      return;
+    }
+
+    if(record.scopeKey !== currentUserProfile.scopeKey){
+      alert("No permission.");
+      return;
+    }
+
+    const voterKey = getCurrentVoterKey();
+    const existingVoters = record.voters || {};
+
+    if(existingVoters[voterKey]){
+      alert("You already voted on this agenda.");
+      return;
+    }
+
+    try{
+      await updateDoc(doc(db, "decisionLogs", id), {
+        [type]: increment(1),
+        [`voters.${voterKey}`]: {
+          uid: auth.currentUser.uid,
+          name: currentUserProfile.name,
+          type
+        },
+        updatedAt: serverTimestamp(),
+        updatedByUid: auth.currentUser.uid,
+        updatedByName: currentUserProfile.name
+      });
+    }catch(error){
+      console.error(error);
+      alert("Vote failed.");
+    }
+  }
+
+  function renderVoteHistory(votersObj){
+    const voters = Object.values(votersObj || {});
+    if(voters.length === 0) return "No votes yet.";
+    return voters.map(v => `${escapeHtml(v.name || "")} (${escapeHtml(v.type || "")})`).join(", ");
+  }
+
   function renderRecords(list){
     const container = document.getElementById("recordList");
 
@@ -750,6 +921,21 @@ Role: ${currentUserProfile.role}`;
           <div class="row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
           <div class="row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
           <div class="row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
+
+          <div class="vote-buttons" style="margin-top:14px;">
+            <button class="yes" onclick="voteAgenda('${r.id}','yes')">👍 Yes</button>
+            <button class="no" onclick="voteAgenda('${r.id}','no')">👎 No</button>
+            <button class="hold" onclick="voteAgenda('${r.id}','hold')">⏳ Hold</button>
+          </div>
+
+          <div class="vote-count" style="margin-top:12px;">
+            <span>Yes ${r.yes || 0}</span>
+            <span>No ${r.no || 0}</span>
+            <span>Hold ${r.hold || 0}</span>
+          </div>
+
+          <div class="vote-history" style="margin-top:12px;"><b>Voters:</b> ${renderVoteHistory(r.voters)}</div>
+
           <div class="row"><b>Created By:</b> ${escapeHtml(r.createdByName || "-")}</div>
           <div class="row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
 
@@ -833,6 +1019,8 @@ Role: ${currentUserProfile.role}`;
   window.applyFilters = applyFilters;
   window.editRecord = editRecord;
   window.deleteRecord = deleteRecord;
+  window.voteDraft = voteDraft;
+  window.voteAgenda = voteAgenda;
 
   onAuthStateChanged(auth, async (user) => {
     try{
@@ -846,6 +1034,15 @@ Role: ${currentUserProfile.role}`;
       renderRecords([]);
 
       if(user){
+        await user.reload();
+
+        if(!user.emailVerified){
+          showMessage("authMessage", "Email is not verified yet.");
+          await signOut(auth).catch(() => {});
+          updateUIForLogout();
+          return;
+        }
+
         await loadUserProfile(user.uid);
         clearForm();
       }else{
@@ -859,6 +1056,7 @@ Role: ${currentUserProfile.role}`;
     }
   });
 
+  updateDraftVoteUI();
   renderRecords([]);
 </script>
 
