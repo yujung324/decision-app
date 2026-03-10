@@ -1,718 +1,734 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DecisionTrack</title>
-<link rel="icon" href="DT_20260310_120547_0000.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DecisionTrack</title>
+  <link rel="icon" href="DT_20260310_120547_0000.png" />
 
-<style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f4f6f8;
-  margin:0;
-  padding:20px;
-}
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background:#f4f6f8;
+      margin:0;
+      padding:20px;
+    }
 
-.container{
-  max-width:760px;
-  margin:0 auto;
-}
+    .container{
+      max-width:760px;
+      margin:0 auto;
+    }
 
-.card{
-  background:#fff;
-  border-radius:20px;
-  padding:24px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.08);
-}
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:24px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    }
 
-h1,h2,h3{
-  margin-top:0;
-}
+    h1,h2,h3{
+      margin-top:0;
+    }
 
-h2{
-  margin:0 0 20px;
-  font-size:28px;
-  font-weight:600;
-}
+    h2{
+      margin:0 0 20px;
+      font-size:28px;
+      font-weight:600;
+    }
 
-label{
-  display:block;
-  margin:18px 0 8px;
-  font-size:18px;
-  font-weight:700;
-}
+    label{
+      display:block;
+      margin:18px 0 8px;
+      font-size:18px;
+      font-weight:700;
+    }
 
-input, textarea, select{
-  width:100%;
-  box-sizing:border-box;
-  border:2px solid #ddd;
-  border-radius:14px;
-  padding:14px;
-  font-size:16px;
-  background:#fff;
-}
+    input, textarea, select{
+      width:100%;
+      box-sizing:border-box;
+      border:2px solid #ddd;
+      border-radius:14px;
+      padding:14px;
+      font-size:16px;
+      background:#fff;
+    }
 
-textarea{
-  min-height:90px;
-  resize:vertical;
-}
+    textarea{
+      min-height:90px;
+      resize:vertical;
+    }
 
-.hidden{
-  display:none !important;
-}
+    .hidden{
+      display:none !important;
+    }
 
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px;
-  margin-bottom:18px;
-  flex-wrap:wrap;
-}
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
 
-.user-badge{
-  background:#eef2ff;
-  color:#1e3a8a;
-  padding:10px 14px;
-  border-radius:999px;
-  font-weight:700;
-}
+    .user-badge{
+      background:#eef2ff;
+      color:#1e3a8a;
+      padding:10px 14px;
+      border-radius:999px;
+      font-weight:700;
+    }
 
-.login-wrap{
-  max-width:520px;
-  margin:40px auto;
-}
+    .login-wrap{
+      max-width:520px;
+      margin:40px auto;
+    }
 
-.login-title{
-  font-size:30px;
-  margin-bottom:8px;
-}
+    .login-title{
+      font-size:30px;
+      margin-bottom:8px;
+    }
 
-.login-desc{
-  color:#555;
-  margin-bottom:20px;
-  line-height:1.5;
-}
+    .login-desc{
+      color:#555;
+      margin-bottom:20px;
+      line-height:1.5;
+    }
 
-.login-actions{
-  display:flex;
-  gap:12px;
-  margin-top:18px;
-}
+    .login-actions{
+      display:flex;
+      gap:12px;
+      margin-top:18px;
+    }
 
-.login-actions button,
-.vote-buttons button,
-.buttons button,
-.topbar button{
-  border:none;
-  border-radius:14px;
-  padding:14px 16px;
-  font-size:16px;
-  font-weight:700;
-  cursor:pointer;
-}
+    .login-actions button,
+    .vote-buttons button,
+    .buttons button,
+    .topbar button{
+      border:none;
+      border-radius:14px;
+      padding:14px 16px;
+      font-size:16px;
+      font-weight:700;
+      cursor:pointer;
+    }
 
-.primary{
-  background:#3f6df6;
-  color:#fff;
-}
+    .primary{
+      background:#3f6df6;
+      color:#fff;
+    }
 
-.secondary{
-  background:#e5e7eb;
-  color:#111;
-}
+    .secondary{
+      background:#e5e7eb;
+      color:#111;
+    }
 
-.vote-buttons{
-  display:flex;
-  gap:12px;
-  margin-top:18px;
-}
+    .vote-buttons{
+      display:flex;
+      gap:12px;
+      margin-top:18px;
+    }
 
-.vote-buttons button{
-  flex:1;
-  font-size:18px;
-}
+    .vote-buttons button{
+      flex:1;
+      font-size:18px;
+    }
 
-.yes{background:#dff5e5;}
-.no{background:#f8dddd;}
-.hold{background:#e9e3fa;}
+    .yes{background:#dff5e5;}
+    .no{background:#f8dddd;}
+    .hold{background:#e9e3fa;}
 
-.vote-count{
-  display:flex;
-  gap:12px;
-  margin-top:14px;
-}
+    .vote-count{
+      display:flex;
+      gap:12px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
 
-.vote-count span{
-  flex:1;
-  text-align:center;
-  background:#eef0f5;
-  border-radius:999px;
-  padding:12px 10px;
-  font-size:18px;
-  font-weight:700;
-}
+    .vote-count span{
+      flex:1;
+      text-align:center;
+      background:#eef0f5;
+      border-radius:999px;
+      padding:12px 10px;
+      font-size:18px;
+      font-weight:700;
+      min-width:120px;
+    }
 
-.buttons{
-  display:flex;
-  gap:12px;
-  margin-top:20px;
-  flex-wrap:wrap;
-}
+    .buttons{
+      display:flex;
+      gap:12px;
+      margin-top:20px;
+      flex-wrap:wrap;
+    }
 
-.buttons button{
-  flex:1;
-  min-width:140px;
-}
+    .buttons button{
+      flex:1;
+      min-width:140px;
+    }
 
-.save{
-  background:#3f6df6;
-  color:#fff;
-}
+    .save{
+      background:#3f6df6;
+      color:#fff;
+    }
 
-.clear{
-  background:#e5e7eb;
-  color:#111;
-}
+    .clear{
+      background:#e5e7eb;
+      color:#111;
+    }
 
-.export{
-  background:#111827;
-  color:#fff;
-}
+    .export{
+      background:#111827;
+      color:#fff;
+    }
 
-.share{
-  background:#10b981;
-  color:#fff;
-}
+    .share{
+      background:#10b981;
+      color:#fff;
+    }
 
-.log-wrap{
-  margin-top:24px;
-}
+    .log-wrap{
+      margin-top:24px;
+    }
 
-.log-tools{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:16px;
-}
+    .log-tools{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
 
-.log-tools input,
-.log-tools select{
-  flex:1;
-  min-width:180px;
-}
+    .log-tools input,
+    .log-tools select{
+      flex:1;
+      min-width:180px;
+    }
 
-.log-card{
-  background:#fff;
-  border-radius:18px;
-  padding:18px;
-  margin-top:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
-}
+    .log-card{
+      background:#fff;
+      border-radius:18px;
+      padding:18px;
+      margin-top:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+    }
 
-.meta{
-  color:#555;
-  margin-bottom:8px;
-  line-height:1.6;
-}
+    .meta{
+      color:#555;
+      margin-bottom:8px;
+      line-height:1.6;
+    }
 
-.small-row{
-  margin-top:10px;
-  font-size:15px;
-  color:#444;
-  line-height:1.5;
-}
+    .small-row{
+      margin-top:10px;
+      font-size:15px;
+      color:#444;
+      line-height:1.5;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
 
-.empty{
-  background:#fff;
-  border-radius:18px;
-  padding:18px;
-  margin-top:14px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.06);
-  color:#666;
-}
+    .empty{
+      background:#fff;
+      border-radius:18px;
+      padding:18px;
+      margin-top:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.06);
+      color:#666;
+    }
 
-.vote-history{
-  margin-top:12px;
-  padding:12px;
-  background:#f8fafc;
-  border-radius:12px;
-  font-size:14px;
-  color:#374151;
-  line-height:1.5;
-}
+    .vote-history{
+      margin-top:12px;
+      padding:12px;
+      background:#f8fafc;
+      border-radius:12px;
+      font-size:14px;
+      color:#374151;
+      line-height:1.5;
+    }
 
-.notice{
-  margin-top:12px;
-  padding:12px;
-  background:#fff7ed;
-  border:1px solid #fed7aa;
-  color:#9a3412;
-  border-radius:12px;
-  font-size:14px;
-}
+    .notice{
+      margin-top:12px;
+      padding:12px;
+      background:#fff7ed;
+      border:1px solid #fed7aa;
+      color:#9a3412;
+      border-radius:12px;
+      font-size:14px;
+      line-height:1.5;
+    }
 
-@media print {
-  body{
-    background:#fff;
-    padding:0;
-  }
+    @media print {
+      body{
+        background:#fff;
+        padding:0;
+      }
 
-  .topbar,
-  .card,
-  .buttons,
-  .log-tools,
-  #loginScreen{
-    display:none !important;
-  }
+      .topbar,
+      .card,
+      .buttons,
+      .log-tools,
+      #loginScreen{
+        display:none !important;
+      }
 
-  .container{
-    max-width:100%;
-  }
+      .container{
+        max-width:100%;
+      }
 
-  .log-card,
-  .empty{
-    box-shadow:none;
-    border:1px solid #ddd;
-    break-inside:avoid;
-  }
-}
-</style>
+      .log-card,
+      .empty{
+        box-shadow:none;
+        border:1px solid #ddd;
+        break-inside:avoid;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen" class="login-wrap">
-  <div class="card">
-    <h1 class="login-title">DecisionTrack Login</h1>
-    <div class="login-desc">
-      Enter your name to use the app.<br>
-      The logged-in name will be used for voting and activity records.
-    </div>
-
-    <label>Your Name</label>
-    <input type="text" id="loginName" placeholder="Enter your name">
-
-    <div class="login-actions">
-      <button class="primary" onclick="login()">Login</button>
-    </div>
-
-    <div class="notice">
-      This is a simple local login structure for MVP use.<br>
-      It is not a real server account system yet.
-    </div>
-  </div>
-</div>
-
-<!-- APP SCREEN -->
-<div id="appScreen" class="hidden">
-  <div class="container">
-
-    <div class="topbar">
-      <div class="user-badge" id="currentUserBadge">Logged in as: -</div>
-      <button class="secondary" onclick="logout()">Logout</button>
-    </div>
-
+  <!-- LOGIN SCREEN -->
+  <div id="loginScreen" class="login-wrap">
     <div class="card">
-      <h2>New Agenda</h2>
+      <h1 class="login-title">DecisionTrack Login</h1>
+      <div class="login-desc">
+        Enter your name to use the app.<br />
+        The logged-in name will be used for voting and activity records.
+      </div>
 
-      <label>Meeting Date</label>
-      <input type="date" id="meetingDate">
+      <label>Your Name</label>
+      <input type="text" id="loginName" placeholder="Enter your name" />
 
-      <label>Decision Owner</label>
-      <input type="text" id="decisionOwner" placeholder="Owner">
-
-      <label>Status</label>
-      <select id="status">
-        <option>Open</option>
-        <option>Done</option>
-      </select>
-
-      <label>Priority</label>
-      <select id="priority">
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
-      </select>
-
-      <label>Agenda</label>
-      <input id="agenda" type="text" placeholder="Agenda title">
-
-      <label>Team</label>
-      <input id="team" type="text" placeholder="e.g. Marketing">
-
-      <label>Description</label>
-      <textarea id="description"></textarea>
-
-      <label>Pros</label>
-      <textarea id="pros"></textarea>
-
-      <label>Cons</label>
-      <textarea id="cons"></textarea>
+      <div class="login-actions">
+        <button class="primary" onclick="login()">Login</button>
+      </div>
 
       <div class="notice">
-        Voting uses the currently logged-in user only.<br>
-        Current voter: <b id="currentVoterText">-</b>
-      </div>
-
-      <div class="vote-buttons">
-        <button class="yes" onclick="vote('yes')">👍 Yes</button>
-        <button class="no" onclick="vote('no')">👎 No</button>
-        <button class="hold" onclick="vote('hold')">⏳ Hold</button>
-      </div>
-
-      <div class="vote-count">
-        <span id="yesCount">Yes 0</span>
-        <span id="noCount">No 0</span>
-        <span id="holdCount">Hold 0</span>
-      </div>
-
-      <div class="vote-history" id="voteHistory">Current voters: none</div>
-
-      <label>Final Decision</label>
-      <textarea id="finalDecision"></textarea>
-
-      <label>Meeting Record</label>
-      <textarea id="meetingRecord"></textarea>
-
-      <div class="buttons">
-        <button class="save" onclick="saveRecord()">Save Record</button>
-        <button class="clear" onclick="clearForm()">Clear</button>
-        <button class="export" onclick="exportPDF()">Export PDF</button>
-        <button class="share" onclick="shareApp()">Share</button>
+        This is a simple local login structure for MVP use.<br />
+        It is not a real server account system yet.
       </div>
     </div>
-
-    <div class="log-wrap">
-      <h2>Meeting Decision Log</h2>
-
-      <div class="log-tools">
-        <input
-          id="searchBox"
-          type="text"
-          placeholder="Search agenda / team / decision"
-          oninput="applyFilters()"
-        >
-
-        <select id="teamFilter" onchange="applyFilters()">
-          <option value="">All Teams</option>
-        </select>
-      </div>
-
-      <div id="recordList"></div>
-    </div>
-
   </div>
-</div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  query,
-  orderBy,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <!-- APP SCREEN -->
+  <div id="appScreen" class="hidden">
+    <div class="container">
 
-/* ===== 여기에 아르카 Firebase 값 넣기 ===== */
-const firebaseConfig = {
-  apiKey: "여기아르카코드",
-  authDomain: "여기아르카코드",
-  projectId: "여기아르카코드",
-  storageBucket: "여기아르카코드",
-  messagingSenderId: "여기아르카코드",
-  appId: "여기아르카코드"
-};
-/* ======================================= */
+      <div class="topbar">
+        <div class="user-badge" id="currentUserBadge">Logged in as: -</div>
+        <button class="secondary" onclick="logout()">Logout</button>
+      </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const recordsRef = collection(db, "decisionLogs");
+      <div class="card">
+        <h2>New Agenda</h2>
 
-let yes = 0;
-let no = 0;
-let hold = 0;
+        <label>Meeting Date</label>
+        <input type="date" id="meetingDate" />
 
-let currentVotes = {};
-let records = [];
-let currentUser = localStorage.getItem("decisiontrack_current_user") || "";
+        <label>Decision Owner</label>
+        <input type="text" id="decisionOwner" placeholder="Owner" />
 
-function normalizeName(name){
-  return name.trim().toLowerCase();
-}
+        <label>Status</label>
+        <select id="status">
+          <option>Open</option>
+          <option>Done</option>
+        </select>
 
-function escapeHtml(text){
-  return String(text)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+        <label>Priority</label>
+        <select id="priority">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
 
-function login(){
-  const name = document.getElementById("loginName").value.trim();
+        <label>Agenda</label>
+        <input id="agenda" type="text" placeholder="Agenda title" />
 
-  if(name === ""){
-    alert("Please enter your name.");
-    return;
-  }
+        <label>Team</label>
+        <input id="team" type="text" placeholder="e.g. Marketing" />
 
-  currentUser = name;
-  localStorage.setItem("decisiontrack_current_user", currentUser);
-  updateAuthUI();
-}
+        <label>Description</label>
+        <textarea id="description"></textarea>
 
-function logout(){
-  const ok = confirm("Do you want to logout?");
-  if(!ok) return;
+        <label>Pros</label>
+        <textarea id="pros"></textarea>
 
-  currentUser = "";
-  localStorage.removeItem("decisiontrack_current_user");
-  document.getElementById("loginName").value = "";
-  updateAuthUI();
-}
+        <label>Cons</label>
+        <textarea id="cons"></textarea>
 
-function updateAuthUI(){
-  const loginScreen = document.getElementById("loginScreen");
-  const appScreen = document.getElementById("appScreen");
-
-  if(currentUser){
-    loginScreen.classList.add("hidden");
-    appScreen.classList.remove("hidden");
-    document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser;
-    document.getElementById("currentVoterText").innerText = currentUser;
-  }else{
-    loginScreen.classList.remove("hidden");
-    appScreen.classList.add("hidden");
-  }
-}
-
-function updateVoteUI(){
-  document.getElementById("yesCount").innerText = "Yes " + yes;
-  document.getElementById("noCount").innerText = "No " + no;
-  document.getElementById("holdCount").innerText = "Hold " + hold;
-
-  const voters = Object.entries(currentVotes);
-
-  if(voters.length === 0){
-    document.getElementById("voteHistory").innerText = "Current voters: none";
-    return;
-  }
-
-  const text = voters.map(([name, type]) => `${name} (${type})`).join(", ");
-  document.getElementById("voteHistory").innerText = "Current voters: " + text;
-}
-
-function vote(type){
-  if(!currentUser){
-    alert("Please login first.");
-    return;
-  }
-
-  const voterKey = normalizeName(currentUser);
-
-  if(currentVotes[voterKey]){
-    alert("You already voted on this agenda.");
-    return;
-  }
-
-  currentVotes[voterKey] = type;
-
-  if(type === "yes") yes++;
-  if(type === "no") no++;
-  if(type === "hold") hold++;
-
-  updateVoteUI();
-}
-
-function clearForm(){
-  document.getElementById("agenda").value = "";
-  document.getElementById("team").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("pros").value = "";
-  document.getElementById("cons").value = "";
-  document.getElementById("finalDecision").value = "";
-  document.getElementById("meetingRecord").value = "";
-  document.getElementById("meetingDate").value = "";
-  document.getElementById("decisionOwner").value = "";
-  document.getElementById("status").value = "Open";
-  document.getElementById("priority").value = "Low";
-
-  yes = 0;
-  no = 0;
-  hold = 0;
-  currentVotes = {};
-
-  updateVoteUI();
-}
-
-async function saveRecord(){
-  if(!currentUser){
-    alert("Please login first.");
-    return;
-  }
-
-  const record = {
-    meetingDate: document.getElementById("meetingDate").value,
-    owner: document.getElementById("decisionOwner").value,
-    status: document.getElementById("status").value,
-    priority: document.getElementById("priority").value,
-    agenda: document.getElementById("agenda").value,
-    team: document.getElementById("team").value,
-    description: document.getElementById("description").value,
-    pros: document.getElementById("pros").value,
-    cons: document.getElementById("cons").value,
-    finalDecision: document.getElementById("finalDecision").value,
-    meetingRecord: document.getElementById("meetingRecord").value,
-    yes,
-    no,
-    hold,
-    voters: currentVotes,
-    createdBy: currentUser,
-    date: new Date().toLocaleString(),
-    createdAt: serverTimestamp()
-  };
-
-  try{
-    await addDoc(recordsRef, record);
-    clearForm();
-  }catch(error){
-    console.error(error);
-    alert("Save failed. Check Firebase config or Firestore rules.");
-  }
-}
-
-function renderFiltered(list){
-  const container = document.getElementById("recordList");
-
-  if(list.length === 0){
-    container.innerHTML = `<div class="empty">No matching records found.</div>`;
-    return;
-  }
-
-  container.innerHTML = list.map(r => {
-    const voterEntries = r.voters
-      ? Object.entries(r.voters).map(([name, type]) => `${escapeHtml(name)} (${escapeHtml(type)})`).join(", ")
-      : "-";
-
-    return `
-      <div class="log-card">
-        <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
-
-        <div class="meta">
-          Team: ${escapeHtml(r.team || "-")} |
-          Owner: ${escapeHtml(r.owner || "-")} |
-          Priority: ${escapeHtml(r.priority || "-")} |
-          Status: ${escapeHtml(r.status || "-")}
+        <div class="notice">
+          Voting uses the currently logged-in user only.<br />
+          Current voter: <b id="currentVoterText">-</b>
         </div>
 
-        <div class="small-row"><b>Meeting Date:</b> ${escapeHtml(r.meetingDate || "-")}</div>
-        <div class="small-row"><b>Description:</b> ${escapeHtml(r.description || "-")}</div>
-        <div class="small-row"><b>Pros:</b> ${escapeHtml(r.pros || "-")}</div>
-        <div class="small-row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
-        <div class="small-row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
-        <div class="small-row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
-        <div class="small-row"><b>Votes:</b> Yes ${r.yes ?? 0} / No ${r.no ?? 0} / Hold ${r.hold ?? 0}</div>
-        <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
-        <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
-        <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
+        <div class="vote-buttons">
+          <button class="yes" onclick="vote('yes')">👍 Yes</button>
+          <button class="no" onclick="vote('no')">👎 No</button>
+          <button class="hold" onclick="vote('hold')">⏳ Hold</button>
+        </div>
+
+        <div class="vote-count">
+          <span id="yesCount">Yes 0</span>
+          <span id="noCount">No 0</span>
+          <span id="holdCount">Hold 0</span>
+        </div>
+
+        <div class="vote-history" id="voteHistory">Current voters: none</div>
+
+        <label>Final Decision</label>
+        <textarea id="finalDecision"></textarea>
+
+        <label>Meeting Record</label>
+        <textarea id="meetingRecord"></textarea>
+
+        <div class="buttons">
+          <button class="save" onclick="saveRecord()">Save Record</button>
+          <button class="clear" onclick="clearForm()">Clear</button>
+          <button class="export" onclick="exportPDF()">Export PDF</button>
+          <button class="share" onclick="shareApp()">Share</button>
+        </div>
       </div>
-    `;
-  }).join("");
-}
 
-function applyFilters(){
-  const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
-  const selectedTeam = document.getElementById("teamFilter").value;
+      <div class="log-wrap">
+        <h2>Meeting Decision Log</h2>
 
-  const filtered = records.filter(r => {
-    const matchesKeyword =
-      (r.agenda || "").toLowerCase().includes(keyword) ||
-      (r.team || "").toLowerCase().includes(keyword) ||
-      (r.finalDecision || "").toLowerCase().includes(keyword);
+        <div class="log-tools">
+          <input
+            id="searchBox"
+            type="text"
+            placeholder="Search agenda / team / decision"
+            oninput="applyFilters()"
+          />
 
-    const matchesTeam =
-      selectedTeam === "" || (r.team || "") === selectedTeam;
+          <select id="teamFilter" onchange="applyFilters()">
+            <option value="">All Teams</option>
+          </select>
+        </div>
 
-    return matchesKeyword && matchesTeam;
-  });
+        <div id="recordList"></div>
+      </div>
 
-  renderFiltered(filtered);
-}
+    </div>
+  </div>
 
-function updateTeamFilter(){
-  const teamFilter = document.getElementById("teamFilter");
-  const currentValue = teamFilter.value;
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const teams = [...new Set(
-    records
-      .map(r => (r.team || "").trim())
-      .filter(team => team !== "")
-  )].sort();
+    const firebaseConfig = {
+      apiKey: "AIzaSyBR3QMI-MtUbIhKgXkBTOWCBW4ZQucjXd0",
+      authDomain: "decisionos-28eb1.firebaseapp.com",
+      projectId: "decisionos-28eb1",
+      storageBucket: "decisionos-28eb1.firebasestorage.app",
+      messagingSenderId: "934462461871",
+      appId: "1:934462461871:web:3b49ee6597a87b7aa9815a"
+    };
 
-  teamFilter.innerHTML =
-    `<option value="">All Teams</option>` +
-    teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const recordsRef = collection(db, "decisionLogs");
 
-  if(teams.includes(currentValue)){
-    teamFilter.value = currentValue;
-  }else{
-    teamFilter.value = "";
-  }
-}
+    let yes = 0;
+    let no = 0;
+    let hold = 0;
 
-function exportPDF(){
-  window.print();
-}
+    let currentVotes = {};
+    let records = [];
+    let currentUser = localStorage.getItem("decisiontrack_current_user") || "";
 
-function shareApp(){
-  if(navigator.share){
-    navigator.share({
-      title: "DecisionTrack",
-      text: "DecisionTrack app",
-      url: window.location.href
-    }).catch(() => {});
-  }else{
-    alert("Sharing is not supported on this device/browser.");
-  }
-}
+    function normalizeName(name){
+      return name.trim().toLowerCase();
+    }
 
-/* 실시간 Firestore 읽기 */
-const q = query(recordsRef, orderBy("createdAt", "desc"));
+    function escapeHtml(text){
+      return String(text ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-onSnapshot(q, (snapshot) => {
-  records = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  }));
+    function login(){
+      const name = document.getElementById("loginName").value.trim();
 
-  updateTeamFilter();
-  applyFilters();
-}, (error) => {
-  console.error(error);
-});
+      if(name === ""){
+        alert("Please enter your name.");
+        return;
+      }
 
-/* inline onclick용으로 window에 연결 */
-window.login = login;
-window.logout = logout;
-window.vote = vote;
-window.clearForm = clearForm;
-window.saveRecord = saveRecord;
-window.applyFilters = applyFilters;
-window.exportPDF = exportPDF;
-window.shareApp = shareApp;
+      currentUser = name;
+      localStorage.setItem("decisiontrack_current_user", currentUser);
+      updateAuthUI();
+    }
 
-updateAuthUI();
-updateVoteUI();
-updateTeamFilter();
-applyFilters();
-</script>
+    function logout(){
+      const ok = confirm("Do you want to logout?");
+      if(!ok) return;
 
+      currentUser = "";
+      localStorage.removeItem("decisiontrack_current_user");
+      document.getElementById("loginName").value = "";
+      updateAuthUI();
+    }
+
+    function updateAuthUI(){
+      const loginScreen = document.getElementById("loginScreen");
+      const appScreen = document.getElementById("appScreen");
+
+      if(currentUser){
+        loginScreen.classList.add("hidden");
+        appScreen.classList.remove("hidden");
+        document.getElementById("currentUserBadge").innerText = "Logged in as: " + currentUser;
+        document.getElementById("currentVoterText").innerText = currentUser;
+      }else{
+        loginScreen.classList.remove("hidden");
+        appScreen.classList.add("hidden");
+      }
+    }
+
+    function updateVoteUI(){
+      document.getElementById("yesCount").innerText = "Yes " + yes;
+      document.getElementById("noCount").innerText = "No " + no;
+      document.getElementById("holdCount").innerText = "Hold " + hold;
+
+      const voters = Object.entries(currentVotes);
+
+      if(voters.length === 0){
+        document.getElementById("voteHistory").innerText = "Current voters: none";
+        return;
+      }
+
+      const text = voters.map(([name, type]) => `${name} (${type})`).join(", ");
+      document.getElementById("voteHistory").innerText = "Current voters: " + text;
+    }
+
+    function vote(type){
+      if(!currentUser){
+        alert("Please login first.");
+        return;
+      }
+
+      const voterKey = normalizeName(currentUser);
+
+      if(currentVotes[voterKey]){
+        alert("You already voted on this agenda.");
+        return;
+      }
+
+      currentVotes[voterKey] = type;
+
+      if(type === "yes") yes++;
+      if(type === "no") no++;
+      if(type === "hold") hold++;
+
+      updateVoteUI();
+    }
+
+    function clearForm(){
+      document.getElementById("agenda").value = "";
+      document.getElementById("team").value = "";
+      document.getElementById("description").value = "";
+      document.getElementById("pros").value = "";
+      document.getElementById("cons").value = "";
+      document.getElementById("finalDecision").value = "";
+      document.getElementById("meetingRecord").value = "";
+      document.getElementById("meetingDate").value = "";
+      document.getElementById("decisionOwner").value = "";
+      document.getElementById("status").value = "Open";
+      document.getElementById("priority").value = "Low";
+
+      yes = 0;
+      no = 0;
+      hold = 0;
+      currentVotes = {};
+
+      updateVoteUI();
+    }
+
+    async function saveRecord(){
+      if(!currentUser){
+        alert("Please login first.");
+        return;
+      }
+
+      const agenda = document.getElementById("agenda").value.trim();
+      const team = document.getElementById("team").value.trim();
+
+      if(agenda === ""){
+        alert("Please enter Agenda.");
+        return;
+      }
+
+      const record = {
+        meetingDate: document.getElementById("meetingDate").value,
+        owner: document.getElementById("decisionOwner").value.trim(),
+        status: document.getElementById("status").value,
+        priority: document.getElementById("priority").value,
+        agenda,
+        team,
+        description: document.getElementById("description").value.trim(),
+        pros: document.getElementById("pros").value.trim(),
+        cons: document.getElementById("cons").value.trim(),
+        finalDecision: document.getElementById("finalDecision").value.trim(),
+        meetingRecord: document.getElementById("meetingRecord").value.trim(),
+        yes,
+        no,
+        hold,
+        voters: currentVotes,
+        createdBy: currentUser,
+        date: new Date().toLocaleString(),
+        createdAt: serverTimestamp()
+      };
+
+      try{
+        await addDoc(recordsRef, record);
+        clearForm();
+        alert("Record saved successfully.");
+      }catch(error){
+        console.error("Save error:", error);
+        alert("Save failed. Check Firebase config or Firestore rules.");
+      }
+    }
+
+    function renderFiltered(list){
+      const container = document.getElementById("recordList");
+
+      if(list.length === 0){
+        container.innerHTML = `<div class="empty">No matching records found.</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(r => {
+        const voterEntries = r.voters
+          ? Object.entries(r.voters)
+              .map(([name, type]) => `${escapeHtml(name)} (${escapeHtml(type)})`)
+              .join(", ")
+          : "-";
+
+        return `
+          <div class="log-card">
+            <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
+
+            <div class="meta">
+              Team: ${escapeHtml(r.team || "-")} |
+              Owner: ${escapeHtml(r.owner || "-")} |
+              Priority: ${escapeHtml(r.priority || "-")} |
+              Status: ${escapeHtml(r.status || "-")}
+            </div>
+
+            <div class="small-row"><b>Meeting Date:</b> ${escapeHtml(r.meetingDate || "-")}</div>
+            <div class="small-row"><b>Description:</b> ${escapeHtml(r.description || "-")}</div>
+            <div class="small-row"><b>Pros:</b> ${escapeHtml(r.pros || "-")}</div>
+            <div class="small-row"><b>Cons:</b> ${escapeHtml(r.cons || "-")}</div>
+            <div class="small-row"><b>Decision:</b> ${escapeHtml(r.finalDecision || "-")}</div>
+            <div class="small-row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
+            <div class="small-row"><b>Votes:</b> Yes ${r.yes ?? 0} / No ${r.no ?? 0} / Hold ${r.hold ?? 0}</div>
+            <div class="small-row"><b>Voters:</b> ${voterEntries || "-"}</div>
+            <div class="small-row"><b>Created By:</b> ${escapeHtml(r.createdBy || "-")}</div>
+            <div class="small-row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function applyFilters(){
+      const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
+      const selectedTeam = document.getElementById("teamFilter").value;
+
+      const filtered = records.filter(r => {
+        const matchesKeyword =
+          (r.agenda || "").toLowerCase().includes(keyword) ||
+          (r.team || "").toLowerCase().includes(keyword) ||
+          (r.finalDecision || "").toLowerCase().includes(keyword) ||
+          (r.description || "").toLowerCase().includes(keyword);
+
+        const matchesTeam =
+          selectedTeam === "" || (r.team || "") === selectedTeam;
+
+        return matchesKeyword && matchesTeam;
+      });
+
+      renderFiltered(filtered);
+    }
+
+    function updateTeamFilter(){
+      const teamFilter = document.getElementById("teamFilter");
+      const currentValue = teamFilter.value;
+
+      const teams = [...new Set(
+        records
+          .map(r => (r.team || "").trim())
+          .filter(team => team !== "")
+      )].sort();
+
+      teamFilter.innerHTML =
+        `<option value="">All Teams</option>` +
+        teams.map(team => `<option value="${escapeHtml(team)}">${escapeHtml(team)}</option>`).join("");
+
+      if(teams.includes(currentValue)){
+        teamFilter.value = currentValue;
+      }else{
+        teamFilter.value = "";
+      }
+    }
+
+    function exportPDF(){
+      window.print();
+    }
+
+    function shareApp(){
+      if(navigator.share){
+        navigator.share({
+          title: "DecisionTrack",
+          text: "DecisionTrack app",
+          url: window.location.href
+        }).catch(() => {});
+      }else{
+        alert("Sharing is not supported on this device/browser.");
+      }
+    }
+
+    const q = query(recordsRef, orderBy("createdAt", "desc"));
+
+    onSnapshot(
+      q,
+      (snapshot) => {
+        records = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        updateTeamFilter();
+        applyFilters();
+      },
+      (error) => {
+        console.error("Snapshot error:", error);
+      }
+    );
+
+    window.login = login;
+    window.logout = logout;
+    window.vote = vote;
+    window.clearForm = clearForm;
+    window.saveRecord = saveRecord;
+    window.applyFilters = applyFilters;
+    window.exportPDF = exportPDF;
+    window.shareApp = shareApp;
+
+    updateAuthUI();
+    updateVoteUI();
+    updateTeamFilter();
+    applyFilters();
+  </script>
 </body>
 </html>
