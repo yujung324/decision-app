@@ -1,79 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecisionTrack</title>
 
 <style>
+
 body{
 font-family:Arial;
-background:#f4f7fb;
-margin:0;
-padding:0;
+background:#f3f5f7;
+padding:20px;
 }
 
 .container{
-max-width:900px;
+max-width:800px;
 margin:auto;
-padding:20px;
 }
 
 .card{
 background:white;
 padding:20px;
-border-radius:15px;
+border-radius:10px;
 margin-bottom:20px;
-box-shadow:0 5px 15px rgba(0,0,0,0.05);
+box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+input,textarea{
+width:100%;
+padding:8px;
+margin:6px 0;
 }
 
 button{
-padding:10px 15px;
-border:none;
-border-radius:8px;
+padding:8px 12px;
+margin-top:6px;
 cursor:pointer;
-font-weight:700;
+border:none;
+background:#2d7ff9;
+color:white;
+border-radius:5px;
 }
 
-.primary{background:#2563eb;color:white}
-.secondary{background:#e5e7eb}
-.danger{background:#ef4444;color:white}
+button.delete{
+background:#e74c3c;
+}
 
-input,textarea,select{
-width:100%;
+.vote button{
+background:#555;
+margin-right:5px;
+}
+
+.search{
+margin-bottom:20px;
+}
+
+.summary{
+background:#f7f9ff;
 padding:10px;
-margin-top:5px;
-margin-bottom:10px;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
-.vote-btn{
-padding:10px;
-margin-right:10px;
-border-radius:8px;
-}
-
-.vote-for{background:#dcfce7}
-.vote-against{background:#fee2e2}
-.vote-hold{background:#ede9fe}
-
-.vote-pill{
-display:inline-block;
-margin-right:10px;
-padding:6px 10px;
-border-radius:20px;
-background:#f1f5f9;
-}
-
-.hidden{display:none}
-
-.log-card{
-background:white;
-padding:15px;
-border-radius:12px;
-margin-bottom:10px;
-border:1px solid #eee;
+border-radius:6px;
+margin-top:10px;
 }
 
 </style>
@@ -85,251 +70,176 @@ border:1px solid #eee;
 
 <h1>DecisionTrack</h1>
 
-<div id="authSection" class="card">
-
-<h3>Login</h3>
-
-<input id="authName" placeholder="Name">
-<input id="authPassword" type="password" placeholder="Password">
-
-<button class="primary" onclick="signUp()">Sign Up</button>
-<button class="secondary" onclick="login()">Login</button>
-
-</div>
-
-<div id="appSection" class="hidden">
-
 <div class="card">
 
 <h3>New Agenda</h3>
 
-<label>Agenda</label>
-<input id="topic">
+<input id="agenda" placeholder="Agenda">
 
-<label>Team</label>
-<input id="team">
+<input id="team" placeholder="Team">
 
-<label>Description</label>
-<textarea id="description"></textarea>
+<textarea id="description" placeholder="Description"></textarea>
 
-<label>Pros</label>
-<textarea id="pros"></textarea>
+<textarea id="pros" placeholder="Pros"></textarea>
 
-<label>Cons</label>
-<textarea id="cons"></textarea>
+<textarea id="cons" placeholder="Cons"></textarea>
 
-<label>Voter</label>
-<input id="voterName">
-
-<div>
-
-<button class="vote-btn vote-for" onclick="addVote('Approve')">👍 Approve</button>
-<button class="vote-btn vote-against" onclick="addVote('Reject')">👎 Reject</button>
-<button class="vote-btn vote-hold" onclick="addVote('Hold')">⏳ Hold</button>
+<button onclick="saveDecision()">Save Decision</button>
 
 </div>
 
-<div>
+<div class="search">
 
-<span class="vote-pill">Approve <span id="voteForCount">0</span></span>
-<span class="vote-pill">Reject <span id="voteAgainstCount">0</span></span>
-<span class="vote-pill">Hold <span id="voteHoldCount">0</span></span>
+<input id="search" placeholder="Search agenda..." onkeyup="render()">
 
 </div>
 
-<label>Final Decision</label>
-<textarea id="decision"></textarea>
+<h2>Decision Log</h2>
 
-<label>Meeting Notes</label>
-<textarea id="meetingNotes"></textarea>
-
-<button class="primary" onclick="saveAgenda()">Save Record</button>
-<button class="secondary" onclick="clearForm()">Clear</button>
-
-</div>
-
-<div class="card">
-
-<h3>Meeting Decision Log</h3>
-
-<div id="recordList"></div>
-
-</div>
-
-</div>
+<div id="log"></div>
 
 </div>
 
 <script>
 
-let users=JSON.parse(localStorage.getItem("users"))||[]
-let currentUser=JSON.parse(localStorage.getItem("currentUser"))||null
-let records=JSON.parse(localStorage.getItem("records"))||[]
-let votes=[]
+let decisions = JSON.parse(localStorage.getItem("decisions")) || [];
 
-function signUp(){
+function saveDecision(){
 
-const name=document.getElementById("authName").value
-const password=document.getElementById("authPassword").value
+let agenda=document.getElementById("agenda").value;
+let team=document.getElementById("team").value;
+let description=document.getElementById("description").value;
+let pros=document.getElementById("pros").value;
+let cons=document.getElementById("cons").value;
 
-users.push({name,password})
+let summary = generateSummary(pros,cons);
 
-localStorage.setItem("users",JSON.stringify(users))
-
-alert("Sign up completed")
-
-}
-
-function login(){
-
-const name=document.getElementById("authName").value
-const password=document.getElementById("authPassword").value
-
-const user=users.find(u=>u.name===name&&u.password===password)
-
-if(!user){
-alert("Login failed")
-return
-}
-
-currentUser=user
-localStorage.setItem("currentUser",JSON.stringify(user))
-
-document.getElementById("authSection").classList.add("hidden")
-document.getElementById("appSection").classList.remove("hidden")
-
-renderRecords()
-
-}
-
-function addVote(type){
-
-const name=document.getElementById("voterName").value
-
-if(!name)return
-
-votes.push({name,type})
-
-renderVotes()
-
-}
-
-function renderVotes(){
-
-document.getElementById("voteForCount").innerText=votes.filter(v=>v.type==="Approve").length
-document.getElementById("voteAgainstCount").innerText=votes.filter(v=>v.type==="Reject").length
-document.getElementById("voteHoldCount").innerText=votes.filter(v=>v.type==="Hold").length
-
-}
-
-async function saveAgenda(){
-
-const topic=document.getElementById("topic").value
-const team=document.getElementById("team").value
-const description=document.getElementById("description").value
-const pros=document.getElementById("pros").value
-const cons=document.getElementById("cons").value
-const decision=document.getElementById("decision").value
-const meetingNotes=document.getElementById("meetingNotes").value
-
-const record={
-topic,
+let item = {
+agenda,
 team,
 description,
 pros,
 cons,
-decision,
-meetingNotes,
-votes,
-date:new Date().toLocaleString()
-}
+summary,
+up:0,
+down:0,
+date:new Date().toLocaleDateString()
+};
 
-records.unshift(record)
+decisions.push(item);
 
-localStorage.setItem("records",JSON.stringify(records))
+localStorage.setItem("decisions",JSON.stringify(decisions));
 
-renderRecords()
+clearForm();
 
-clearForm()
-
-if(window.db){
-
-try{
-
-await addDoc(collection(db,"decisionLogs"),record)
-
-console.log("Saved to Firebase")
-
-}catch(e){
-
-console.log("Firebase save failed")
+render();
 
 }
 
+function generateSummary(pros,cons){
+
+let p=pros.split("\n").length;
+let c=cons.split("\n").length;
+
+if(p>c){
+return "Recommendation: Proceed (Pros stronger)";
 }
+
+if(c>p){
+return "Recommendation: Reconsider (Cons stronger)";
+}
+
+return "Recommendation: Needs further discussion";
 
 }
 
 function clearForm(){
 
-document.getElementById("topic").value=""
-document.getElementById("team").value=""
-document.getElementById("description").value=""
-document.getElementById("pros").value=""
-document.getElementById("cons").value=""
-document.getElementById("decision").value=""
-document.getElementById("meetingNotes").value=""
-document.getElementById("voterName").value=""
-
-votes=[]
-
-renderVotes()
+document.getElementById("agenda").value="";
+document.getElementById("team").value="";
+document.getElementById("description").value="";
+document.getElementById("pros").value="";
+document.getElementById("cons").value="";
 
 }
 
-function renderRecords(){
+function vote(i,type){
 
-const list=document.getElementById("recordList")
+if(type==="up")decisions[i].up++;
+if(type==="down")decisions[i].down++;
 
-list.innerHTML=records.map(r=>`
+localStorage.setItem("decisions",JSON.stringify(decisions));
 
-<div class="log-card">
+render();
 
-<b>${r.topic}</b>
+}
 
-<div>Team: ${r.team}</div>
-<div>Decision: ${r.decision}</div>
+function removeDecision(i){
+
+decisions.splice(i,1);
+
+localStorage.setItem("decisions",JSON.stringify(decisions));
+
+render();
+
+}
+
+function render(){
+
+let log=document.getElementById("log");
+
+let search=document.getElementById("search").value.toLowerCase();
+
+log.innerHTML="";
+
+decisions.forEach((d,i)=>{
+
+if(!d.agenda.toLowerCase().includes(search)) return;
+
+log.innerHTML+=`
+
+<div class="card">
+
+<h3>${d.agenda}</h3>
+
+<b>Team:</b> ${d.team}<br>
+<b>Date:</b> ${d.date}<br><br>
+
+<b>Description</b><br>
+${d.description}<br><br>
+
+<b>Pros</b><br>
+${d.pros}<br><br>
+
+<b>Cons</b><br>
+${d.cons}<br>
+
+<div class="summary">
+
+<b>AI Decision Summary</b><br>
+${d.summary}
 
 </div>
 
-`).join("")
+<div class="vote">
+
+<button onclick="vote(${i},'up')">👍 ${d.up}</button>
+
+<button onclick="vote(${i},'down')">👎 ${d.down}</button>
+
+<button class="delete" onclick="removeDecision(${i})">Delete</button>
+
+</div>
+
+</div>
+
+`;
+
+});
 
 }
 
-</script>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey:"AIzaSyBR3QMI-MtUbIhKgXkBTOWCBW4ZQucjXd0",
-authDomain:"decisionos-28eb1.firebaseapp.com",
-projectId:"decisionos-28eb1",
-storageBucket:"decisionos-28eb1.appspot.com",
-messagingSenderId:"934462461871",
-appId:"1:934462461871:web:3b49ee6597a87b7aa9815a"
-};
-
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
-
-window.db=db
-window.addDoc=addDoc
-window.collection=collection
-
-console.log("Firebase connected")
+render();
 
 </script>
 
