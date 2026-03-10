@@ -88,6 +88,9 @@
     .secondary{ background:#e5e7eb; color:#111; }
     .danger{ background:#dc2626; color:#fff; }
     .edit{ background:#f59e0b; color:#fff; }
+    .pdf{ background:#0f766e; color:#fff; }
+    .lock{ background:#7c3aed; color:#fff; }
+    .unlock{ background:#2563eb; color:#fff; }
 
     .tab-btn{
       background:#e5e7eb;
@@ -219,7 +222,31 @@
       white-space:pre-wrap;
       word-break:break-word;
     }
+
+    .locked-badge{
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#f3e8ff;
+      color:#6b21a8;
+      font-weight:700;
+      font-size:13px;
+    }
+
+    .open-badge{
+      display:inline-block;
+      margin-top:10px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#dcfce7;
+      color:#166534;
+      font-weight:700;
+      font-size:13px;
+    }
   </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -456,6 +483,10 @@
       .replace(/'/g, "&#039;");
   }
 
+  function safeText(value){
+    return String(value ?? "").trim();
+  }
+
   function getCurrentVoterKey(){
     if(!auth.currentUser || !currentUserProfile) return "";
     return `${auth.currentUser.uid}__${normalizeName(currentUserProfile.name)}`;
@@ -565,7 +596,7 @@
         name: name,
         company: company,
         team: team,
-        scopeKey: company.toLowerCase() + "__" + team,
+        scopeKey: getScopeKey(company, team),
         role: "leader",
         createdAt: serverTimestamp()
       });
@@ -739,6 +770,7 @@ Role: ${currentUserProfile.role}`;
       no: draftNo,
       hold: draftHold,
       voters: draftVotes,
+      locked: editingId ? (records.find(r => r.id === editingId)?.locked ?? false) : false,
       updatedAt: serverTimestamp(),
       updatedByUid: auth.currentUser.uid,
       updatedByName: currentUserProfile.name
@@ -860,6 +892,11 @@ Role: ${currentUserProfile.role}`;
       return;
     }
 
+    if(record.locked){
+      alert("Voting is closed for this agenda.");
+      return;
+    }
+
     const voterKey = getCurrentVoterKey();
     const existingVoters = record.voters || {};
 
@@ -886,10 +923,141 @@ Role: ${currentUserProfile.role}`;
     }
   }
 
+  async function lockVoting(id){
+    const record = records.find(r => r.id === id);
+    if(!record){
+      alert("Record not found.");
+      return;
+    }
+
+    if(!canManageRecord(record)){
+      alert("No permission.");
+      return;
+    }
+
+    const ok = confirm(`Close voting for this agenda?\n\n${record.agenda}`);
+    if(!ok) return;
+
+    try{
+      await updateDoc(doc(db, "decisionLogs", id), {
+        locked: true,
+        updatedAt: serverTimestamp(),
+        updatedByUid: auth.currentUser.uid,
+        updatedByName: currentUserProfile.name
+      });
+      alert("Voting closed.");
+    }catch(error){
+      console.error(error);
+      alert("Lock failed.");
+    }
+  }
+
+  async function unlockVoting(id){
+    const record = records.find(r => r.id === id);
+    if(!record){
+      alert("Record not found.");
+      return;
+    }
+
+    if(!canManageRecord(record)){
+      alert("No permission.");
+      return;
+    }
+
+    const ok = confirm(`Re-open voting for this agenda?\n\n${record.agenda}`);
+    if(!ok) return;
+
+    try{
+      await updateDoc(doc(db, "decisionLogs", id), {
+        locked: false,
+        updatedAt: serverTimestamp(),
+        updatedByUid: auth.currentUser.uid,
+        updatedByName: currentUserProfile.name
+      });
+      alert("Voting reopened.");
+    }catch(error){
+      console.error(error);
+      alert("Unlock failed.");
+    }
+  }
+
   function renderVoteHistory(votersObj){
     const voters = Object.values(votersObj || {});
     if(voters.length === 0) return "No votes yet.";
     return voters.map(v => `${escapeHtml(v.name || "")} (${escapeHtml(v.type || "")})`).join(", ");
+  }
+
+  function addWrappedText(pdf, label, value, y, pageWidth){
+    const text = safeText(value) || "-";
+    pdf.setFont("helvetica", "bold");
+    pdf.text(label, 10, y);
+    y += 7;
+
+    pdf.setFont("helvetica", "normal");
+    const lines = pdf.splitTextToSize(text, pageWidth);
+    pdf.text(lines, 10, y);
+    y += (lines.length * 7) + 5;
+
+    if(y > 270){
+      pdf.addPage();
+      y = 20;
+    }
+    return y;
+  }
+
+  async function exportPDF(id){
+    const record = records.find(r => r.id === id);
+    if(!record){
+      alert("Record not found.");
+      return;
+    }
+
+    if(record.scopeKey !== currentUserProfile?.scopeKey){
+      alert("No permission.");
+      return;
+    }
+
+    try{
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+      const pageWidth = 190;
+
+      let y = 20;
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(18);
+      pdf.text("DecisionTrack Meeting Record", 10, y);
+      y += 12;
+
+      pdf.setFontSize(11);
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Company: ${safeText(record.company) || "-"}`, 10, y); y += 7;
+      pdf.text(`Team: ${safeText(record.team) || "-"}`, 10, y); y += 7;
+      pdf.text(`Agenda: ${safeText(record.agenda) || "-"}`, 10, y); y += 7;
+      pdf.text(`Owner: ${safeText(record.owner) || "-"}`, 10, y); y += 7;
+      pdf.text(`Meeting Date: ${safeText(record.meetingDate) || "-"}`, 10, y); y += 7;
+      pdf.text(`Priority: ${safeText(record.priority) || "-"}`, 10, y); y += 7;
+      pdf.text(`Status: ${safeText(record.status) || "-"}`, 10, y); y += 7;
+      pdf.text(`Voting: Yes ${record.yes || 0} / No ${record.no || 0} / Hold ${record.hold || 0}`, 10, y); y += 7;
+      pdf.text(`Voting Locked: ${record.locked ? "Yes" : "No"}`, 10, y); y += 10;
+
+      y = addWrappedText(pdf, "Description", record.description, y, pageWidth);
+      y = addWrappedText(pdf, "Pros", record.pros, y, pageWidth);
+      y = addWrappedText(pdf, "Cons", record.cons, y, pageWidth);
+      y = addWrappedText(pdf, "Final Decision", record.finalDecision, y, pageWidth);
+      y = addWrappedText(pdf, "Meeting Record", record.meetingRecord, y, pageWidth);
+      y = addWrappedText(pdf, "Voters", renderVoteHistory(record.voters), y, pageWidth);
+
+      pdf.setFont("helvetica", "normal");
+      pdf.text(`Created By: ${safeText(record.createdByName) || "-"}`, 10, y); y += 7;
+      pdf.text(`Saved: ${safeText(record.date) || "-"}`, 10, y);
+
+      const fileName = `${safeText(record.agenda || "meeting_record").replace(/[\\/:*?"<>|]/g, "_")}.pdf`;
+      pdf.save(fileName);
+    }catch(error){
+      console.error(error);
+      alert("PDF export failed.");
+    }
   }
 
   function renderRecords(list){
@@ -902,6 +1070,9 @@ Role: ${currentUserProfile.role}`;
 
     container.innerHTML = list.map(r => {
       const canManage = canManageRecord(r);
+      const lockedBadge = r.locked
+        ? `<div class="locked-badge">🔒 Voting Closed</div>`
+        : `<div class="open-badge">🟢 Voting Open</div>`;
 
       return `
         <div class="record">
@@ -915,6 +1086,8 @@ Role: ${currentUserProfile.role}`;
             Status: ${escapeHtml(r.status || "-")}
           </div>
 
+          ${lockedBadge}
+
           <div class="row"><b>Meeting Date:</b> ${escapeHtml(r.meetingDate || "-")}</div>
           <div class="row"><b>Description:</b> ${escapeHtml(r.description || "-")}</div>
           <div class="row"><b>Pros:</b> ${escapeHtml(r.pros || "-")}</div>
@@ -923,9 +1096,9 @@ Role: ${currentUserProfile.role}`;
           <div class="row"><b>Meeting Record:</b> ${escapeHtml(r.meetingRecord || "-")}</div>
 
           <div class="vote-buttons" style="margin-top:14px;">
-            <button class="yes" onclick="voteAgenda('${r.id}','yes')">👍 Yes</button>
-            <button class="no" onclick="voteAgenda('${r.id}','no')">👎 No</button>
-            <button class="hold" onclick="voteAgenda('${r.id}','hold')">⏳ Hold</button>
+            <button class="yes" onclick="voteAgenda('${r.id}','yes')" ${r.locked ? "disabled" : ""}>👍 Yes</button>
+            <button class="no" onclick="voteAgenda('${r.id}','no')" ${r.locked ? "disabled" : ""}>👎 No</button>
+            <button class="hold" onclick="voteAgenda('${r.id}','hold')" ${r.locked ? "disabled" : ""}>⏳ Hold</button>
           </div>
 
           <div class="vote-count" style="margin-top:12px;">
@@ -940,8 +1113,11 @@ Role: ${currentUserProfile.role}`;
           <div class="row"><b>Saved:</b> ${escapeHtml(r.date || "-")}</div>
 
           <div class="record-actions" style="margin-top:12px;">
+            <button class="pdf" onclick="exportPDF('${r.id}')">PDF</button>
             ${canManage ? `<button class="edit" onclick="editRecord('${r.id}')">Edit</button>` : ""}
             ${canManage ? `<button class="danger" onclick="deleteRecord('${r.id}')">Delete</button>` : ""}
+            ${canManage && !r.locked ? `<button class="lock" onclick="lockVoting('${r.id}')">Close Voting</button>` : ""}
+            ${canManage && r.locked ? `<button class="unlock" onclick="unlockVoting('${r.id}')">Reopen Voting</button>` : ""}
           </div>
         </div>
       `;
@@ -1021,6 +1197,9 @@ Role: ${currentUserProfile.role}`;
   window.deleteRecord = deleteRecord;
   window.voteDraft = voteDraft;
   window.voteAgenda = voteAgenda;
+  window.lockVoting = lockVoting;
+  window.unlockVoting = unlockVoting;
+  window.exportPDF = exportPDF;
 
   onAuthStateChanged(auth, async (user) => {
     try{
