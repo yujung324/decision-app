@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -100,6 +100,47 @@
     .tab-btn.active{
       background:#3f6df6;
       color:#fff;
+    }
+
+    .signup-mode-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:12px;
+      margin-top:10px;
+    }
+
+    .signup-mode-card{
+      border:2px solid #dbe2ea;
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      cursor:pointer;
+      transition:all 0.2s ease;
+    }
+
+    .signup-mode-card:hover{
+      border-color:#93c5fd;
+      box-shadow:0 6px 18px rgba(59,130,246,0.10);
+    }
+
+    .signup-mode-card.active{
+      border-color:#3f6df6;
+      background:#eef4ff;
+      box-shadow:0 8px 20px rgba(63,109,246,0.15);
+    }
+
+    .signup-mode-title{
+      font-size:18px;
+      font-weight:800;
+      color:#111827;
+      margin-bottom:8px;
+    }
+
+    .signup-mode-sub{
+      font-size:13px;
+      color:#4b5563;
+      line-height:1.6;
+      white-space:pre-line;
     }
 
     .badge{
@@ -379,11 +420,37 @@
     </div>
 
     <div id="signupPane">
-      <label>Company</label>
-      <input id="signupCompany" placeholder="Company name" />
+      <label>Choose your workspace type</label>
 
-      <label>Team</label>
-      <input id="signupTeam" placeholder="Team name" />
+      <div class="signup-mode-grid">
+        <div id="companyModeCard" class="signup-mode-card active" onclick="selectSignupMode('company')">
+          <div class="signup-mode-title">🏢 Team / Company</div>
+          <div class="signup-mode-sub">Shared workspace
+Team voting
+Meeting decision logs
+Best for teams and organizations</div>
+        </div>
+
+        <div id="personalModeCard" class="signup-mode-card" onclick="selectSignupMode('personal')">
+          <div class="signup-mode-title">👤 Personal</div>
+          <div class="signup-mode-sub">Private workspace
+No company/team required
+Best for solo decision tracking</div>
+        </div>
+      </div>
+
+      <div id="companyFields">
+        <label>Company</label>
+        <input id="signupCompany" placeholder="Company name" />
+
+        <label>Team</label>
+        <input id="signupTeam" placeholder="Team name" />
+      </div>
+
+      <div id="personalNotice" class="notice hidden">
+        Personal mode creates your own private workspace.
+        Company and Team fields are not required in personal mode.
+      </div>
 
       <label>Your Name</label>
       <input id="signupName" placeholder="Your name" />
@@ -400,7 +467,8 @@
 
       <div class="notice">
         New accounts are automatically saved to Firestore users collection.
-        New signups are created as leader in this version.
+        Team / Company signups are created as leader in this version.
+        Personal signups are created with a private workspace.
       </div>
     </div>
 
@@ -427,6 +495,8 @@
 
     <div class="auth-help">
       DecisionTrack helps teams record agendas, votes, decisions, and meeting notes in one place.<br><br>
+      Personal mode is for private decision tracking.<br>
+      Team / Company mode is for shared workspace voting and records.<br><br>
       Email verification may be delayed on some providers. Gmail is recommended for faster signup.
     </div>
 
@@ -468,7 +538,7 @@
       <label>Agenda</label>
       <input id="agenda" placeholder="Agenda title" />
 
-      <label>Team</label>
+      <label>Team / Workspace</label>
       <input id="team" readonly />
 
       <label>Description</label>
@@ -482,7 +552,7 @@
 
       <div class="notice">
         Draft voting below is optional before saving the agenda.
-        After saving, everyone in the same company/team can vote directly on the saved agenda card.
+        After saving, everyone in the same workspace can vote directly on the saved agenda card.
       </div>
 
       <div class="vote-buttons">
@@ -585,6 +655,8 @@
   let draftHold = 0;
   let draftVotes = {};
 
+  let signupMode = "company";
+
   function normalizeName(name){
     return String(name || "")
       .trim()
@@ -595,6 +667,10 @@
 
   function getScopeKey(company, team){
     return `${normalizeName(company)}__${normalizeName(team)}`;
+  }
+
+  function getPersonalScopeKey(uid){
+    return `personal__${uid}`;
   }
 
   function escapeHtml(text){
@@ -653,6 +729,23 @@
     hideMessage("authMessage");
   }
 
+  function selectSignupMode(mode){
+    signupMode = mode;
+
+    document.getElementById("companyModeCard").classList.remove("active");
+    document.getElementById("personalModeCard").classList.remove("active");
+
+    if(mode === "company"){
+      document.getElementById("companyModeCard").classList.add("active");
+      document.getElementById("companyFields").classList.remove("hidden");
+      document.getElementById("personalNotice").classList.add("hidden");
+    }else{
+      document.getElementById("personalModeCard").classList.add("active");
+      document.getElementById("companyFields").classList.add("hidden");
+      document.getElementById("personalNotice").classList.remove("hidden");
+    }
+  }
+
   function updateDraftVoteUI(){
     document.getElementById("yesCount").innerText = `Yes ${draftYes}`;
     document.getElementById("noCount").innerText = `No ${draftNo}`;
@@ -698,20 +791,39 @@
   async function signUp(){
     hideMessage("authMessage");
 
-    const company = document.getElementById("signupCompany").value.trim();
-    const team = document.getElementById("signupTeam").value.trim();
     const name = document.getElementById("signupName").value.trim();
     const email = document.getElementById("signupEmail").value.trim();
     const password = document.getElementById("signupPassword").value;
 
-    if(!company || !team || !name || !email || !password){
-      showMessage("authMessage", "Please fill in all signup fields.");
+    let company = "";
+    let team = "";
+    let role = "leader";
+    let accountType = signupMode;
+
+    if(!name || !email || !password){
+      showMessage("authMessage", "Please fill in all required signup fields.");
       return;
+    }
+
+    if(signupMode === "company"){
+      company = document.getElementById("signupCompany").value.trim();
+      team = document.getElementById("signupTeam").value.trim();
+
+      if(!company || !team){
+        showMessage("authMessage", "Please enter company and team for Team / Company mode.");
+        return;
+      }
     }
 
     try{
       const cred = await createUserWithEmailAndPassword(auth, email, password);
       const user = cred.user;
+
+      if(signupMode === "personal"){
+        company = "Personal";
+        team = "My Workspace";
+        role = "owner";
+      }
 
       await setDoc(doc(db, "users", user.uid), {
         uid: user.uid,
@@ -719,8 +831,9 @@
         name: name,
         company: company,
         team: team,
-        scopeKey: getScopeKey(company, team),
-        role: "leader",
+        accountType: accountType,
+        scopeKey: signupMode === "personal" ? getPersonalScopeKey(user.uid) : getScopeKey(company, team),
+        role: role,
         createdAt: serverTimestamp()
       });
 
@@ -804,17 +917,25 @@
     document.getElementById("authScreen").classList.add("hidden");
     document.getElementById("appScreen").classList.remove("hidden");
 
+    const accountTypeText = currentUserProfile.accountType === "personal" ? "Personal" : "Team / Company";
+
     document.getElementById("userBadge").innerText =
       `Name: ${currentUserProfile.name}
 Email: ${currentUserProfile.email}
+Mode: ${accountTypeText}
 Company: ${currentUserProfile.company}
 Team: ${currentUserProfile.team}
 Role: ${currentUserProfile.role}`;
 
     document.getElementById("scopeInfo").innerText =
-      `Current workspace: ${currentUserProfile.company} / ${currentUserProfile.team}`;
+      currentUserProfile.accountType === "personal"
+        ? `Current workspace: Personal / My Workspace`
+        : `Current workspace: ${currentUserProfile.company} / ${currentUserProfile.team}`;
 
-    document.getElementById("team").value = currentUserProfile.team;
+    document.getElementById("team").value =
+      currentUserProfile.accountType === "personal"
+        ? "My Workspace"
+        : currentUserProfile.team;
   }
 
   function updateUIForLogout(){
@@ -828,7 +949,8 @@ Role: ${currentUserProfile.role}`;
 
     return (
       record.createdByUid === auth.currentUser.uid ||
-      currentUserProfile.role === "leader"
+      currentUserProfile.role === "leader" ||
+      currentUserProfile.role === "owner"
     );
   }
 
@@ -842,7 +964,7 @@ Role: ${currentUserProfile.role}`;
     document.getElementById("status").value = "Open";
     document.getElementById("priority").value = "Low";
     document.getElementById("agenda").value = "";
-    document.getElementById("team").value = currentUserProfile?.team || "";
+    document.getElementById("team").value = currentUserProfile?.accountType === "personal" ? "My Workspace" : (currentUserProfile?.team || "");
     document.getElementById("description").value = "";
     document.getElementById("pros").value = "";
     document.getElementById("cons").value = "";
@@ -877,8 +999,9 @@ Role: ${currentUserProfile.role}`;
 
     const payload = {
       company: currentUserProfile.company,
-      team: currentUserProfile.team,
+      team: currentUserProfile.accountType === "personal" ? "My Workspace" : currentUserProfile.team,
       scopeKey: currentUserProfile.scopeKey,
+      accountType: currentUserProfile.accountType || "company",
       meetingDate: document.getElementById("meetingDate").value,
       owner: document.getElementById("decisionOwner").value.trim(),
       status: document.getElementById("status").value,
@@ -953,7 +1076,7 @@ Role: ${currentUserProfile.role}`;
     document.getElementById("status").value = record.status || "Open";
     document.getElementById("priority").value = record.priority || "Low";
     document.getElementById("agenda").value = record.agenda || "";
-    document.getElementById("team").value = record.team || currentUserProfile.team;
+    document.getElementById("team").value = record.team || (currentUserProfile.accountType === "personal" ? "My Workspace" : currentUserProfile.team);
     document.getElementById("description").value = record.description || "";
     document.getElementById("pros").value = record.pros || "";
     document.getElementById("cons").value = record.cons || "";
@@ -1120,8 +1243,9 @@ Role: ${currentUserProfile.role}`;
         <div class="pdf-title">${escapeHtml(record.agenda || "(No Agenda)")}</div>
 
         <div class="pdf-meta">
+Mode: ${escapeHtml(record.accountType === "personal" ? "Personal" : "Team / Company")}
 Company: ${escapeHtml(record.company || "-")}
-Team: ${escapeHtml(record.team || "-")}
+Team / Workspace: ${escapeHtml(record.team || "-")}
 Owner: ${escapeHtml(record.owner || "-")}
 Priority: ${escapeHtml(record.priority || "-")}
 Status: ${escapeHtml(record.status || "-")}
@@ -1248,13 +1372,16 @@ Saved: ${escapeHtml(record.date || "-")}
         ? `<div class="locked-badge">🔒 Voting Closed</div>`
         : `<div class="open-badge">🟢 Voting Open</div>`;
 
+      const modeText = r.accountType === "personal" ? "Personal" : "Team / Company";
+
       return `
         <div class="record">
           <h3>${escapeHtml(r.agenda || "(No Agenda)")}</h3>
 
           <div class="meta">
+            Mode: ${escapeHtml(modeText)}
             Company: ${escapeHtml(r.company || "-")}
-            Team: ${escapeHtml(r.team || "-")}
+            Team / Workspace: ${escapeHtml(r.team || "-")}
             Owner: ${escapeHtml(r.owner || "-")}
             Priority: ${escapeHtml(r.priority || "-")}
             Status: ${escapeHtml(r.status || "-")}
@@ -1360,6 +1487,7 @@ Saved: ${escapeHtml(record.date || "-")}
   }
 
   window.switchTab = switchTab;
+  window.selectSignupMode = selectSignupMode;
   window.signUp = signUp;
   window.login = login;
   window.resetPassword = resetPassword;
@@ -1409,9 +1537,10 @@ Saved: ${escapeHtml(record.date || "-")}
     }
   });
 
+  selectSignupMode("company");
   updateDraftVoteUI();
   renderRecords([]);
 </script>
 
 </body>
-</html>  
+    </html>
